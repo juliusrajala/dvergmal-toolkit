@@ -1,0 +1,10 @@
+---
+import { clearSessionCookie, getCurrentPlayerId } from "../db/utils/session";
+const user = await getCurrentPlayerId(Astro.cookies);
+
+if (user) {
+  clearSessionCookie(Astro.cookies);
+}
+
+return Astro.redirect("/");
+---
