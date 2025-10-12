@@ -2,7 +2,7 @@ import { db, PlayerDieRoll, PlayerInGame, eq, and, asc, desc, Player } from 'ast
 import { z } from 'astro:schema';
 
 const dieInRoll = z.object({
-  die: z.number().min(2),
+  die: z.string(),
   value: z.number().min(1),
 })
 
@@ -13,7 +13,7 @@ export async function createDieRoll(
   gameId: number,
   notation: string,
   result: number,
-  dies: { die: number; value: number }[]
+  dies: Die[]
 ) {
   // Validate dies structure
   const parsedDies = z.array(dieInRoll).parse(dies);
@@ -40,7 +40,7 @@ export interface DieRoll {
   id: number;
   player: {
     id: number;
-    email: string;
+    characterName: string;
   }
   gameId: number;
   rollTotal: number;
@@ -64,21 +64,17 @@ export async function getDierollsInGame(playerId: number, gameId: number): Promi
   const dieRolls = await db
     .select()
     .from(PlayerDieRoll)
-    .innerJoin(
-      Player,
-      eq(Player.id, PlayerDieRoll.playerId)
-    )
+    .innerJoin(PlayerInGame, eq(PlayerDieRoll.playerId, PlayerInGame.playerId))
     .where(and(eq(PlayerDieRoll.playerId, playerId), eq(PlayerDieRoll.gameId, gameId)))
     .orderBy(desc(PlayerDieRoll.createdAt))
     .limit(20);
 
-  console.log("Fetched die rolls:", dieRolls);
 
-  return dieRolls.map(({ PlayerDieRoll, Player }) => ({
+  return dieRolls.map(({ PlayerDieRoll, PlayerInGame }) => ({
     ...PlayerDieRoll,
     player: {
-      id: Player.id,
-      email: Player.email,
+      id: PlayerInGame.playerId,
+      characterName: PlayerInGame.characterName,
     },
   })) as DieRoll[];
 }

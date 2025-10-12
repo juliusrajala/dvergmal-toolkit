@@ -13,7 +13,7 @@ export async function createGame(ownerId: number, name: string, secret: string):
   // Automatically add the owner as a player in the game
   await db
     .insert(PlayerInGame)
-    .values({ playerId: ownerId, gameId: newGame.id, joinedAt: new Date() });
+    .values({ playerId: ownerId, gameId: newGame.id, joinedAt: new Date(), characterName: 'Dungeon Master' });
 
   return newGame.id;
 }
@@ -57,7 +57,8 @@ export async function getGameByPlayerAndGameId(
 export async function joinGameByNameAndSecret(
   playerId: number,
   name: string,
-  secret: string
+  secret: string,
+  characterName: string = 'Adventurer'
 ): Promise<void> {
   const [game] = await db
     .select()
@@ -71,7 +72,7 @@ export async function joinGameByNameAndSecret(
 
   await db
     .insert(PlayerInGame)
-    .values({ playerId, gameId: game.id, joinedAt: new Date() });
+    .values({ playerId, gameId: game.id, joinedAt: new Date(), characterName });
 
 }
 
@@ -89,6 +90,7 @@ export async function getPlayerGames(playerId: number) {
   return games.map(({ Game, Player, PlayerInGame }) => ({
     ...Game,
     ownerEmail: Player.email,
+    characterName: PlayerInGame.characterName,
     joined: PlayerInGame.joinedAt
   }));
 }

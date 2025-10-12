@@ -4,24 +4,31 @@ export const validDice = ['d4', 'd6', 'd8', 'd10', 'd12', 'd20', 'd100'] as cons
 export type DieType = (typeof validDice)[number];
 
 const rollDie = (die: DieType): number => {
+  console.log(`Rolling a ${die}`);
   const sides = parseInt(die.substring(1), 10);
+  console.log(`Die has ${sides} sides`);
   return Math.floor(Math.random() * sides) + 1;
 }
 
-export function rollDice(dice: Die[]) {
-  let reults = {
+export function rollDice(dice: DieType[]) {
+  let results: {
+    total: number;
+    dice: Die[]
+  } = {
     total: 0,
-    dies: [] as { die: number; value: number }[],
+    dice: [] as Die[],
   }
   for (const die of dice) {
-    const dieType = `d${die.die}` as DieType;
-    if (!validDice.includes(dieType)) {
-      throw new Error(`Invalid die type: ${dieType}`);
+    console.log(`Processing die: ${die}`);
+    if (!validDice.includes(die)) {
+      throw new Error(`Invalid die type: ${die}`);
     }
-    const value = rollDie(dieType);
-    reults.total += value;
-    reults.dies.push({ die: die.die, value });
+    const value = rollDie(die);
+    results.total += value;
+    results.dice.push({ die: die, value });
   }
 
-  return reults;
+  console.log("Roll results:", results);
+
+  return results;
 }

@@ -18,6 +18,7 @@ if (userId) {
       <thead>
         <tr>
           <th>Game Name</th>
+          <th>Character</th>
           <th>Owner</th>
           <th>Created At</th>
           <th>Joined on</th>
@@ -32,6 +33,7 @@ if (userId) {
                   {game.name}
                 </a>
               </td>
+              <td>{game.characterName}</td>
               <td>{game.ownerEmail}</td>
               <td>{new Date(game.createdAt).toLocaleDateString()}</td>
               <td>{new Date(game.joined).toLocaleDateString()}</td>

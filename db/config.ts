@@ -22,6 +22,7 @@ const PlayerInGame = defineTable({
     id: column.number({ primaryKey: true, unique: true }),
     playerId: column.number({ references: () => Player.columns.id }),
     gameId: column.number({ references: () => Game.columns.id }),
+    characterName: column.text({ optional: false }),
     joinedAt: column.date(),
   }
 })
