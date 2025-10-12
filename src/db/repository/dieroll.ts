@@ -1,4 +1,4 @@
-import { and, asc, db, desc, eq, Player,PlayerDieRoll, PlayerInGame } from 'astro:db';
+import { and, db, desc, eq, PlayerDieRoll, PlayerInGame, RollPrompt } from 'astro:db';
 import { z } from 'astro:schema';
 
 const dieInRoll = z.object({
@@ -8,13 +8,16 @@ const dieInRoll = z.object({
 
 export type Die = z.infer<typeof dieInRoll>;
 
-export async function createDieRoll(
+export async function createDieRoll({
+  playerId, gameId, notation, result, dies, promptId
+}: {
   playerId: number,
   gameId: number,
   notation: string,
   result: number,
-  dies: Die[]
-) {
+  dies: Die[],
+  promptId?: number
+}) {
   // Validate dies structure
   const parsedDies = z.array(dieInRoll).parse(dies);
   if (parsedDies.length === 0) {
@@ -28,6 +31,7 @@ export async function createDieRoll(
       playerId,
       createdAt: new Date(),
       gameId,
+      promptId,
       context: notation,
       rollTotal: result,
       dies: parsedDies,
@@ -47,6 +51,12 @@ export interface DieRoll {
   context?: string;
   createdAt: Date;
   dies: Die[];
+  relatedPrompt: {
+    id: number;
+    gameId: number;
+    prompt: string;
+    createdAt: Date;
+  } | null;
 }
 
 
@@ -70,13 +80,15 @@ export async function getDierollsInGame(playerId: number, gameId: number): Promi
         eq(PlayerDieRoll.gameId, PlayerInGame.gameId)
       )
     )
-    .where(and(eq(PlayerDieRoll.playerId, playerId), eq(PlayerDieRoll.gameId, gameId)))
+    .leftJoin(RollPrompt, eq(PlayerDieRoll.promptId, RollPrompt.id))
+    .where(eq(PlayerDieRoll.gameId, gameId))
     .orderBy(desc(PlayerDieRoll.createdAt))
     .limit(20);
 
 
-  return dieRolls.map(({ PlayerDieRoll, PlayerInGame }) => ({
+  return dieRolls.map(({ PlayerDieRoll, PlayerInGame, RollPrompt }) => ({
     ...PlayerDieRoll,
+    relatedPrompt: RollPrompt,
     player: {
       id: PlayerInGame.playerId,
       characterName: PlayerInGame.characterName,

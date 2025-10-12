@@ -24,7 +24,7 @@ const RollItem = ({ roll, ownId }: Props) => {
   const baseContainerClass = 'flex flex-col w-full border border-base-100 p-3 gap-2 rounded-md';
   return (
     <div className={roll.player.id === ownId ? baseContainerClass.concat(' bg-secondary/5') : baseContainerClass.concat(' bg-base-200/50')}>
-      <div className='text-sm'><span className='font-semibold'>{roll.player.characterName}</span> rolled{roll.context ? ` (${roll.context}):` : ':'}</div>
+      <div className='text-sm'><span className='font-semibold'>{roll.player.characterName}</span> at {new Date(roll.createdAt).toLocaleString('en-uk')}: </div>
       <div className='flex flex-row gap-2 items-center flex-wrap'>
         {mapDice(roll.dies)}
         <span className='flex flex-row gap-2 items-center'>
@@ -32,6 +32,10 @@ const RollItem = ({ roll, ownId }: Props) => {
           <div className='badge badge-primary badge-lg font-semibold'>{roll.rollTotal}</div>
         </span>
       </div>
+      {roll.relatedPrompt && <span className='text-xs italic opacity-50'>
+        {roll.relatedPrompt.prompt}
+      </span>}
+
     </div>
   )
 }

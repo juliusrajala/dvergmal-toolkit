@@ -1,16 +1,16 @@
 import { useState } from 'react';
 
 import type { DieRoll } from '../../db/repository/dieroll';
-import { type DieType, validDice } from '../../tools/dice';
 import type { PromptWithRelatedRolls } from '../../db/repository/prompts';
+import { type DieType, validDice } from '../../tools/dice';
 
-const submitDieRoll = async (gameId: number, dice: DieType[]): Promise<{ dieRolls: Array<DieRoll> }> => {
+const submitDieRoll = async (gameId: number, dice: DieType[], promptId?: number): Promise<{ dieRolls: Array<DieRoll> }> => {
   const res = await fetch('/api/game/dice/' + gameId, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },
-    body: JSON.stringify({ gameId, dice }),
+    body: JSON.stringify({ gameId, dice, promptId }),
   });
 
   if (!res.ok) {
@@ -36,21 +36,22 @@ const mapMaskedDie = (die: DieType) => {
 
 interface Props {
   gameId: number;
+  unansweredPrompts: PromptWithRelatedRolls[];
   updateParentRolls: (newRolls: Array<DieRoll>) => void;
-  lastPrompt: PromptWithRelatedRolls | null;
 }
 
 const RollTray = ({
   gameId,
+  unansweredPrompts,
   updateParentRolls,
-  lastPrompt = null
 }: Props) => {
   const [hand, setHand] = useState<DieType[]>([]); // Fetch rolls from the database
+  const [selectedPromptId, setSelectedPromptId] = useState<number | undefined>(unansweredPrompts[0]?.id);
 
   // Function to handle rolling dice
   const rollDice = async () => {
     try {
-      const { dieRolls } = await submitDieRoll(gameId, hand);
+      const { dieRolls } = await submitDieRoll(gameId, hand, selectedPromptId);
       updateParentRolls(dieRolls);
       setHand([]); // Clear hand after rolling
     } catch (error) {
@@ -64,6 +65,10 @@ const RollTray = ({
 
   const addDieToHand = (die: DieType) => {
     setHand(prev => [...prev, die]);
+  }
+
+  const setPrompt = (promptId: number | undefined) => {
+    setSelectedPromptId(promptId);
   }
 
   return (
@@ -80,8 +85,15 @@ const RollTray = ({
             <button key={die} className='btn btn-outline btn-sm' onClick={() => addDieToHand(die)}>{die}</button>
           ))}
         </div>
-
-        <button className='btn btn-primary btn-md' onClick={() => rollDice()}>Roll</button>
+        <div className='flex flex-row gap-2 w-full md:w-auto'>
+          <select className='select select-bordered w-full md:w-48' disabled={unansweredPrompts.length === 0} value={selectedPromptId} onChange={(e) => setPrompt(Number(e.target.value) || undefined)}>
+            <option>No prompt</option>
+            {
+              unansweredPrompts.map(p => (<option key={p.id} value={p.id}>{p.prompt}</option>))
+            }
+          </select>
+          <button className='btn btn-primary btn-md' onClick={() => rollDice()}>Roll dice</button>
+        </div>
       </div>
     </div>
   )

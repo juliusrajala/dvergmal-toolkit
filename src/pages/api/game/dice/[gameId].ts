@@ -38,6 +38,7 @@ export const POST: APIRoute = async ({ cookies, params, request }) => {
   const input = await request.json();
   try {
     const rolledDice = input.dice;
+    const promptId = input.promptId;
     if (!Array.isArray(rolledDice) || rolledDice.length === 0) {
       throw new Error('No dice provided for rolling');
     }
@@ -47,13 +48,14 @@ export const POST: APIRoute = async ({ cookies, params, request }) => {
 
     console.log("Rolled dice result:", { total, dice });
     const { playerId, gameIdAsNumber } = await validateEndpoints(cookies, params.gameId);
-    const dieRolls = await createDieRoll(
+    const dieRolls = await createDieRoll({
       playerId,
-      gameIdAsNumber,
-      input.notation,
-      total,
-      dice
-    );
+      gameId: gameIdAsNumber,
+      notation: input.notation,
+      result: total,
+      promptId,
+      dies: dice
+    });
 
     return new Response(
       JSON.stringify({ dieRolls }),

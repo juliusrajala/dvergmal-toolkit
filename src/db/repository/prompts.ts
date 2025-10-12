@@ -28,13 +28,13 @@ export const getPromptsWithRelatedRolls = async (
   playerId: number, gameId: number
 ): Promise<PromptWithRelatedRolls[]> => {
   // Check if player is part of the game
-  const playerInGame = await db
+  const playersInGame = await db
     .select()
     .from(PlayerInGame)
-    .where(and(eq(PlayerInGame.playerId, playerId), eq(PlayerInGame.gameId, gameId)))
-    .limit(1);
+    .where(eq(PlayerInGame.gameId, gameId))
 
-  if (playerInGame.length === 0) {
+
+  if (playersInGame.every(pig => pig.playerId !== playerId)) {
     throw new Error('Player is not part of the game');
   }
 
@@ -54,7 +54,13 @@ export const getPromptsWithRelatedRolls = async (
   const promptsWithRolls = prompts.map(prompt => ({
     ...prompt,
     playerIds: prompt.playerIds as number[],
-    relatedDieRolls: relatedDieRolls.filter(roll => roll.promptId === prompt.id)
+    characters: (prompt.playerIds as number[]).map(pid => playersInGame.find(pig => pig.playerId === pid)?.characterName || 'Unknown adventurer'),
+    relatedDieRolls: relatedDieRolls
+      .filter(roll => roll.promptId === prompt.id)
+      .map(roll => ({
+        ...roll,
+        character: playersInGame.find(pig => pig.playerId === roll.playerId)?.characterName || 'Unknown'
+      }))
   })) as PromptWithRelatedRolls[];
 
   return promptsWithRolls;
@@ -98,7 +104,9 @@ export interface Prompt {
 }
 
 export interface PromptWithRelatedRolls extends Prompt {
+  characters: string[]; // Array of character names who were prompted
   relatedDieRolls: {
+    character: string;
     id: number;
     playerId: number;
     gameId: number;
