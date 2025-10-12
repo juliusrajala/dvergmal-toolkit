@@ -25,6 +25,7 @@ export const gameActions = {
     input: z.object({
       name: z.string().min(10, 'Game name is required'),
       secret: z.string().min(16, 'Game secret is required'),
+      chararacterName: z.string().min(1, 'Character name is required').max(30, 'Character name is too long'),
     }),
     handler: async (input, { cookies, ...rest }) => {
       const playerId = await getCurrentPlayerId(cookies);

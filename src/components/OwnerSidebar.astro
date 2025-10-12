@@ -1,0 +1,59 @@
+---
+import { actions } from "astro:actions";
+import { getPlayerInGame, getPlayersInGame } from "../db/repository/game";
+import { getCurrentPlayerId } from "../db/utils/session";
+
+const gameId = Astro.props.gameId;
+
+const userId = await getCurrentPlayerId(Astro.cookies);
+if (!userId) {
+  console.error("No user logged in, redirecting to /");
+  return Astro.redirect("/");
+}
+
+const players = await getPlayersInGame(gameId, userId);
+---
+
+<form class="flex flex-col gap-5" action={actions.promptPlayers} method="POST">
+  <table class="table table-sm table-zebra w-full">
+    <tbody>
+      {
+        players.map((player) => (
+          <tr>
+            <td>
+              <span class="mask mask-squircle text-secondary bg-amber-200 w-6 h-6 flex items-center justify-center font-semibold">
+                {player.characterName
+                  .split(" ")
+                  .map((n) => n.charAt(0).toUpperCase())
+                  .join("")}
+              </span>
+            </td>
+            <td>{player.characterName}</td>
+            {userId !== player.playerId && (
+              <td>
+                <input
+                  class="checkbox checkbox-sm"
+                  name="targetPlayerIds"
+                  type="checkbox"
+                  value={player.playerId}
+                />
+              </td>
+            )}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+  <div class="flex flex-col gap-5">
+    <input
+      type="text"
+      name="reason"
+      placeholder="Reason (optional)"
+      class="input input-bordered input-sm w-full"
+    />
+
+    <button class="btn btn-sm btn-primary btn-outline" type="submit">
+      Prompt a roll
+    </button>
+  </div>
+</form>

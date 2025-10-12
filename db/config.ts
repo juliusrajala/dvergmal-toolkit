@@ -19,7 +19,6 @@ export const Player = defineTable({
 
 const PlayerInGame = defineTable({
   columns: {
-    id: column.number({ primaryKey: true, unique: true }),
     playerId: column.number({ references: () => Player.columns.id }),
     gameId: column.number({ references: () => Game.columns.id }),
     characterName: column.text({ optional: false }),
@@ -46,9 +45,9 @@ const RollPrompt = defineTable({
   columns: {
     id: column.number({ primaryKey: true, unique: true }),
     gameId: column.number({ references: () => Game.columns.id }),
-    playerId: column.number({ references: () => Player.columns.id }),
     prompt: column.text(),
     createdAt: column.date(),
+    playerIds: column.json({ optional: false, }), // Array of player IDs who were prompted
   }
 })
 

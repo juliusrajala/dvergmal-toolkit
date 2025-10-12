@@ -6,6 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "format": "eslint src/**/*.{ts,tsx,astro}",
     "astro": "astro"
   },
   "dependencies": {
@@ -23,6 +24,9 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
-    "@types/bcrypt": "^6.0.0"
+    "@types/bcrypt": "^6.0.0",
+    "@typescript-eslint/parser": "^8.46.0",
+    "eslint": "^9.37.0",
+    "eslint-plugin-astro": "^1.3.1"
   }
 }

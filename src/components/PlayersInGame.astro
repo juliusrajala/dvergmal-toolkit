@@ -1,4 +1,5 @@
 ---
+import { actions } from "astro:actions";
 import { getPlayerInGame, getPlayersInGame } from "../db/repository/game";
 import { getCurrentPlayerId } from "../db/utils/session";
 
@@ -9,54 +10,25 @@ if (!userId) {
   console.error("No user logged in, redirecting to /");
   return Astro.redirect("/");
 }
-const gameStatus = await getPlayerInGame(userId, gameId);
-
 const players = await getPlayersInGame(gameId, userId);
 ---
 
-<form class="flex flex-col gap-5">
-  <table class="table table-sm table-zebra w-full">
-    <tbody>
-      {
-        players.map((player) => (
-          <tr>
-            <td>
-              <span class="mask mask-squircle text-secondary bg-amber-200 w-6 h-6 flex items-center justify-center font-semibold">
-                {player.characterName
-                  .split(" ")
-                  .map((n) => n.charAt(0).toUpperCase())
-                  .join("")}
-              </span>
-            </td>
-            <td>{player.characterName}</td>
-            {gameStatus.isOwner && userId !== player.id && (
-              <td>
-                <input
-                  class="checkbox checkbox-sm"
-                  type="checkbox"
-                  value={player.id}
-                />
-              </td>
-            )}
-          </tr>
-        ))
-      }
-    </tbody>
-  </table>
-  {
-    gameStatus.isOwner && (
-      <div class="flex flex-col gap-5">
-        <input
-          type="text"
-          name="promptReason"
-          placeholder="Reason (optional)"
-          class="input input-bordered input-sm w-full"
-        />
-
-        <button class="btn btn-sm btn-primary btn-outline" type="submit">
-          Prompt a roll
-        </button>
-      </div>
-    )
-  }
-</form>
+<table class="table table-sm table-zebra w-full">
+  <tbody>
+    {
+      players.map((player) => (
+        <tr>
+          <td>
+            <span class="mask mask-squircle text-secondary bg-amber-200 w-6 h-6 flex items-center justify-center font-semibold">
+              {player.characterName
+                .split(" ")
+                .map((n) => n.charAt(0).toUpperCase())
+                .join("")}
+            </span>
+          </td>
+          <td>{player.characterName}</td>
+        </tr>
+      ))
+    }
+  </tbody>
+</table>
