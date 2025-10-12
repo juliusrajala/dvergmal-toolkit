@@ -1,0 +1,22 @@
+---
+import CreateGameForm from "../../components/CreateGameForm.astro";
+import GameTable from "../../components/GameTable.astro";
+import { getCurrentPlayerId } from "../../db/utils/session";
+import ToolkitLayout from "../../layouts/toolkit.astro";
+
+const user = await getCurrentPlayerId(Astro.cookies);
+
+if (!user) {
+  console.error("No user logged in, redirecting to /");
+  return Astro.redirect("/");
+}
+---
+
+<ToolkitLayout>
+  <aside class="flex flex-col">
+    <CreateGameForm />
+  </aside>
+  <section class="flex flex-col flex-1 w-full">
+    <GameTable />
+  </section>
+</ToolkitLayout>

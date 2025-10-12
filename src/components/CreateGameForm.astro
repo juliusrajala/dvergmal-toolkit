@@ -1,0 +1,30 @@
+---
+import { actions } from "astro:actions";
+
+const result = Astro.getActionResult(actions.createGame);
+
+if (result && !result.error) {
+  // If the game was created successfully, redirect to the game's page
+  Astro.redirect(`/toolkit/game/${result.data.gameId}`);
+}
+---
+
+<div class="card max-w-lg bg-base-200">
+  <form class="card-body" method="POST" action={actions.createGame}>
+    <h2 class="card-title">Create a New Game</h2>
+    <input
+      type="text"
+      name="name"
+      placeholder="Game Name"
+      required
+      class="input input-bordered w-full mb-4"
+    />
+    <input
+      type="text"
+      name="secret"
+      placeholder="Joining secret"
+      class="input input-bordered w-full mb-4"
+    />
+    <button type="submit" class="btn btn-primary w-full">Create Game</button>
+  </form>
+</div>

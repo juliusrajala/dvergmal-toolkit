@@ -5,7 +5,8 @@ export const Game = defineTable({
     id: column.number({ primaryKey: true, unique: true }),
     ownerId: column.number({ references: () => Player.columns.id }),
     name: column.text(),
-    createdAt: column.date({ default: new Date() }),
+    createdAt: column.date(),
+    secret: column.text(),
   }
 })
 
@@ -13,6 +14,40 @@ export const Player = defineTable({
   columns: {
     id: column.number({ primaryKey: true, unique: true }),
     email: column.text({ unique: true }),
+  }
+})
+
+const PlayerInGame = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, unique: true }),
+    playerId: column.number({ references: () => Player.columns.id }),
+    gameId: column.number({ references: () => Game.columns.id }),
+    joinedAt: column.date(),
+  }
+})
+
+const PlayerDieRoll = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, unique: true }),
+    gameId: column.number({ references: () => Game.columns.id }),
+    playerId: column.number({ references: () => Player.columns.id }),
+    rollTotal: column.number(),
+    context: column.text({ optional: true }),
+    promptId: column.number({ references: () => RollPrompt.columns.id, optional: true }),
+    createdAt: column.date(),
+    dies: column.json({
+      optional: false
+    }), // Array of dies, e.g. [{ die: 6, value: 4 }, { die: 20, value: 15 }]
+  }
+})
+
+const RollPrompt = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, unique: true }),
+    gameId: column.number({ references: () => Game.columns.id }),
+    playerInGameId: column.number({ references: () => PlayerInGame.columns.id }),
+    prompt: column.text(),
+    createdAt: column.date(),
   }
 })
 
@@ -35,5 +70,8 @@ export const Session = defineTable({
 
 // https://astro.build/db/config
 export default defineDb({
-  tables: { Game, Player, Password, Session }
+  tables: {
+    Game, Player, Password, Session
+    , PlayerInGame, PlayerDieRoll, RollPrompt
+  }
 })

@@ -1,0 +1,44 @@
+---
+import { getPlayerGames } from "../db/repository/game";
+import { getCurrentPlayerId } from "../db/utils/session";
+
+let games: Awaited<ReturnType<typeof getPlayerGames>> = [];
+
+const userId = await getCurrentPlayerId(Astro.cookies);
+
+if (userId) {
+  games = await getPlayerGames(userId);
+}
+---
+
+<div class="card flex-1 w-full bg-base-200">
+  <div class="card-body">
+    <h2 class="card-title">Your Games</h2>
+    <table class="table w-full">
+      <thead>
+        <tr>
+          <th>Game Name</th>
+          <th>Owner</th>
+          <th>Created At</th>
+          <th>Joined on</th>
+        </tr>
+      </thead>
+      <tbody>
+        {
+          games.map((game) => (
+            <tr>
+              <td>
+                <a class="link font-semibold" href={`/toolkit/game/${game.id}`}>
+                  {game.name}
+                </a>
+              </td>
+              <td>{game.ownerEmail}</td>
+              <td>{new Date(game.createdAt).toLocaleDateString()}</td>
+              <td>{new Date(game.joined).toLocaleDateString()}</td>
+            </tr>
+          ))
+        }
+      </tbody>
+    </table>
+  </div>
+</div>

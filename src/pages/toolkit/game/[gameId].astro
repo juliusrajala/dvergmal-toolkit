@@ -1,0 +1,53 @@
+---
+import DiceTray from "../../../components/dynamic/DiceTray";
+import { getDierollsInGame } from "../../../db/repository/dieroll";
+import { getGameByPlayerAndGameId } from "../../../db/repository/game";
+import { getCurrentPlayerId } from "../../../db/utils/session";
+import Toolkit from "../../../layouts/toolkit.astro";
+
+const gameId = Astro.params.gameId;
+const userId = await getCurrentPlayerId(Astro.cookies);
+if (!userId) {
+  console.error("No user logged in, redirecting to /");
+  return Astro.redirect("/");
+}
+
+if (!gameId) {
+  console.error("No gameId provided in URL, redirecting to /toolkit");
+  return Astro.redirect("/toolkit");
+}
+
+const game = await getGameByPlayerAndGameId(userId, Number(gameId));
+const dieRolls = await getDierollsInGame(userId, Number(gameId));
+
+if (!game) {
+  console.error(
+    "User",
+    userId,
+    "is not part of game",
+    gameId,
+    "redirecting to /toolkit",
+  );
+  return Astro.redirect("/toolkit");
+}
+---
+
+<Toolkit <div>
+  <div class="card max-w-md flex-1 bg-base-200">
+    <div class="card-body">
+      <h1 class="card-title">Game ID: {game.name}</h1>
+      <p>Welcome to the game page! More features coming soon.</p>
+    </div>
+  </div>
+  <div class="card flex-2 bg-base-200 w-full">
+    <div class="card-body">
+      <h2 class="card-title">Dice Tray</h2>
+      <DiceTray
+        playerId={userId}
+        gameId={Number(gameId)}
+        initialRolls={dieRolls}
+        client:only
+      />
+    </div>
+  </div>
+</Toolkit>

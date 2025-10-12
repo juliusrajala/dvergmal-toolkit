@@ -10,21 +10,26 @@ if (user) {
 	return Astro.redirect("/toolkit");
 }
 
+let error: string | null = null;
+
 if (request.method === "POST") {
 	const formData = await request.formData();
 	const email = formData.get("email")?.toString() || "";
 	const password = formData.get("password")?.toString() || "";
 
 	if (!email || !password) {
-		throw new Error("Email and password are required");
+		error = "Email and password are required.";
+	} else if (password.length < 8) {
+		error = "Password must be at least 8 characters long.";
 	}
-
-	const playerSession = await loginPlayer(email, password);
-	if (!playerSession) {
-		throw new Error("Invalid email or password");
+	try {
+		const playerSession = await loginPlayer(email, password);
+		setSessionCookie(Astro.cookies, playerSession);
+		return Astro.redirect("/toolkit");
+	} catch (e) {
+		console.error("Error logging in:", e);
+		error = "Invalid email or password.";
 	}
-	setSessionCookie(Astro.cookies, playerSession);
-	return Astro.redirect("/toolkit");
 }
 ---
 
@@ -48,6 +53,7 @@ if (request.method === "POST") {
 				name="password"
 				required
 			/>
+			{error && <p class="text-error">{error}</p>}
 			<div class="card-actions justify-between">
 				<a class="btn btn-secondary btn-ghost" href="/signup"
 					>Sign up with invitation</a

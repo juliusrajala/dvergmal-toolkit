@@ -6,13 +6,12 @@ import { getCurrentPlayerId } from "../db/utils/session";
 const user = await getCurrentPlayerId(Astro.cookies);
 
 if (!user) {
-  console.error("No user logged in, redirecting to /login");
-  // If user is logged in, redirect to dashboard
-  Astro.redirect("/login");
+  console.error("No user logged in, redirecting to /");
+  return Astro.redirect("/");
 }
 ---
 
-<html lang="en">
+<html lang="en" data-theme="coffee">
   <head>
     <meta charset="utf-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -21,12 +20,15 @@ if (!user) {
     <title>Dweomer Toolkit</title>
   </head>
   <body>
-    <header>
-      <nav>
-        <a href="/toolkit">Dashboard</a> |
-        <a href="/logout">Logout</a>
+    <header class="navbar justify-between bg-base-300">
+      <a class="btn btn-ghost normal-case text-xl" href="/">Dweomer Toolkit</a>
+      <nav class="flex wjustify-between gap-4">
+        <a class="link-primary" href="/toolkit">Dashboard</a>
+        <a class="link-primary" href="/logout">Logout</a>
       </nav>
     </header>
-    <slot />
+    <main class="flex flex-row w-full p-10 gap-5 items-start">
+      <slot />
+    </main>
   </body>
 </html>
