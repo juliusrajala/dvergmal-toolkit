@@ -1,5 +1,5 @@
-import { db, eq, Session } from 'astro:db';
 import type { AstroCookies } from 'astro';
+import { db, eq, Session } from 'astro:db';
 import { getSecret } from 'astro:env/server';
 
 const SESSION_COOKIE_NAME = 'session_token';

@@ -1,8 +1,9 @@
 import { db } from 'astro:db';
-import { signupAndCreateSession } from '../src/db/repository/session';
-import { email } from 'zod';
 import { getSecret } from 'astro:env/server';
+import { email } from 'zod';
+
 import { createGame, joinGameByNameAndSecret } from '../src/db/repository/game';
+import { signupAndCreateSession } from '../src/db/repository/session';
 
 // https://astro.build/db/seed
 export default async function seed() {

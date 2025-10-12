@@ -1,7 +1,8 @@
-import { z } from 'astro:schema';
-import { getCurrentPlayerId } from '../db/utils/session';
 import { defineAction } from 'astro:actions';
+import { z } from 'astro:schema';
+
 import { createPrompt } from '../db/repository/prompts';
+import { getCurrentPlayerId } from '../db/utils/session';
 
 export const promptActions = {
   promptPlayers: defineAction({
@@ -23,11 +24,9 @@ export const promptActions = {
         throw new Error('Select at least one player to prompt');
       }
 
+      await createPrompt({ playerId, gameId: Number(gameId), targetPlayerIds: input.targetPlayerIds, reason: input.reason || 'Roll prompted.' });
 
-      await createPrompt(playerId, Number(gameId), input.targetPlayerIds, input.reason || 'Roll prompted.');
-
-
-      return { success: true }
+      return { success: true };
     },
   })
 

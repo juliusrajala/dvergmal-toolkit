@@ -1,7 +1,8 @@
 import { defineAction } from 'astro:actions';
-import { getCurrentPlayerId } from '../db/utils/session';
-import { createGame, joinGameByNameAndSecret } from '../db/repository/game';
 import { z } from 'astro:schema';
+
+import { createGame, joinGameByNameAndSecret } from '../db/repository/game';
+import { getCurrentPlayerId } from '../db/utils/session';
 
 export const gameActions = {
   createGame: defineAction({

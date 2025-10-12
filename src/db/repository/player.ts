@@ -1,6 +1,7 @@
 import { db, eq, Password, Player } from 'astro:db';
-import { createSession, validateInvitationCode } from '../utils/session';
+
 import { hashPassword } from '../utils/hash';
+import { createSession, validateInvitationCode } from '../utils/session';
 
 export async function signupPlayer(email: string, password: string, invitation: string): Promise<string> {
   const validInvitation = validateInvitationCode(invitation);

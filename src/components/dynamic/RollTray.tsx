@@ -1,6 +1,8 @@
 import { useState } from 'react';
-import { validDice, type DieType } from '../../tools/dice';
+
 import type { DieRoll } from '../../db/repository/dieroll';
+import { type DieType, validDice } from '../../tools/dice';
+import type { PromptWithRelatedRolls } from '../../db/repository/prompts';
 
 const submitDieRoll = async (gameId: number, dice: DieType[]): Promise<{ dieRolls: Array<DieRoll> }> => {
   const res = await fetch('/api/game/dice/' + gameId, {
@@ -35,11 +37,13 @@ const mapMaskedDie = (die: DieType) => {
 interface Props {
   gameId: number;
   updateParentRolls: (newRolls: Array<DieRoll>) => void;
+  lastPrompt: PromptWithRelatedRolls | null;
 }
 
 const RollTray = ({
   gameId,
-  updateParentRolls
+  updateParentRolls,
+  lastPrompt = null
 }: Props) => {
   const [hand, setHand] = useState<DieType[]>([]); // Fetch rolls from the database
 

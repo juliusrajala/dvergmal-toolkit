@@ -1,5 +1,4 @@
 ---
-import { Player } from "astro:db";
 import DiceTray from "../../../components/dynamic/DiceTray";
 import { getDierollsInGame } from "../../../db/repository/dieroll";
 import {
@@ -10,6 +9,8 @@ import { getCurrentPlayerId } from "../../../db/utils/session";
 import Toolkit from "../../../layouts/toolkit.astro";
 import PlayersInGame from "../../../components/PlayersInGame.astro";
 import OwnerSidebar from "../../../components/OwnerSidebar.astro";
+import { actions } from "astro:actions";
+import { getPromptsWithRelatedRolls } from "../../../db/repository/prompts";
 
 const gameId = Astro.params.gameId;
 const userId = await getCurrentPlayerId(Astro.cookies);
@@ -23,6 +24,12 @@ if (!gameId) {
   return Astro.redirect("/toolkit");
 }
 
+// Handle action result and redirect to clear URL
+const result = Astro.getActionResult(actions.promptPlayers);
+if (result && !result.error) {
+  return Astro.redirect(`/toolkit/game/${gameId}`);
+}
+
 const game = await getGameByPlayerAndGameId(userId, Number(gameId));
 if (!game) {
   console.error(`No access to game with id ${gameId}, redirecting to /toolkit`);
@@ -31,6 +38,7 @@ if (!game) {
 
 const dieRolls = await getDierollsInGame(userId, Number(gameId));
 const gameStatus = await getPlayerInGame(userId, Number(gameId));
+const prompts = await getPromptsWithRelatedRolls(userId, Number(gameId));
 ---
 
 <Toolkit>
@@ -54,7 +62,8 @@ const gameStatus = await getPlayerInGame(userId, Number(gameId));
         playerId={userId}
         gameId={Number(gameId)}
         initialRolls={dieRolls}
-        client:only
+        initialPrompts={prompts}
+        client:only="/"
       />
     </div>
   </div>

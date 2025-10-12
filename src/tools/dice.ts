@@ -11,7 +11,7 @@ const rollDie = (die: DieType): number => {
 }
 
 export function rollDice(dice: DieType[]) {
-  let results: {
+  const results: {
     total: number;
     dice: Die[]
   } = {

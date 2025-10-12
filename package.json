@@ -6,7 +6,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
-    "format": "eslint src/**/*.{ts,tsx,astro}",
+    "format": "eslint --fix src/ --ext .ts,.astro",
     "astro": "astro"
   },
   "dependencies": {
@@ -24,9 +24,14 @@
     "zod": "^4.1.12"
   },
   "devDependencies": {
+    "@eslint/js": "^9.37.0",
     "@types/bcrypt": "^6.0.0",
-    "@typescript-eslint/parser": "^8.46.0",
     "eslint": "^9.37.0",
-    "eslint-plugin-astro": "^1.3.1"
+    "eslint-plugin-astro": "^1.3.1",
+    "eslint-plugin-import": "^2.32.0",
+    "eslint-plugin-react": "^7.37.5",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "globals": "^16.4.0",
+    "typescript-eslint": "^8.46.0"
   }
 }

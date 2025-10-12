@@ -1,12 +1,16 @@
 import { useCallback, useEffect, useState } from 'react';
+
 import type { Die, DieRoll } from '../../db/repository/dieroll';
-import RollTray from './RollTray';
 import RollItem from './RollItem';
+import PromptItem from './PromptItem';
+import RollTray from './RollTray';
+import type { PromptWithRelatedRolls } from '../../db/repository/prompts';
 
 interface Props {
   gameId: number;
   playerId: number;
-  initialRolls?: DieRolls;
+  initialRolls: DieRolls;
+  initialPrompts: PromptWithRelatedRolls[];
 }
 
 type DieRolls = Array<DieRoll>
@@ -27,69 +31,94 @@ const fetchDieRolls = async (gameId: number): Promise<{ dieRolls: DieRolls }> =>
   return res.json();
 }
 
+const mapEventsOnTray = (
+  events: Array<DieRoll | PromptWithRelatedRolls>,
+  playerId: number
+) => {
+  return events.sort((a, b) => {
+    const dateA = new Date(a.createdAt).getTime();
+    const dateB = new Date(b.createdAt).getTime();
+    return dateB - dateA;
+  })
+    .map(event => {
+      if ('rollTotal' in event) {
+        return (
+          <RollItem key={`roll-${event.id}-${event.createdAt}`} roll={event} ownId={playerId} />
+        )
+      } else {
+        return (
+          <PromptItem key={`prompt-${event.id}-${event.createdAt}`} prompt={event} ownId={playerId} />
+        )
+      }
+    });
+}
 
 const DiceTray = ({
   gameId,
   playerId,
-  initialRolls = []
+  initialRolls = [],
+  initialPrompts = []
 }: Props) => {
   const [rolls, setRolls] = useState<DieRolls>(initialRolls); // Fetch rolls from the database
-  const latestKnownRoll = rolls[0];
+  const [prompts, setPrompts] = useState<PromptWithRelatedRolls[]>(initialPrompts);
 
-  const syncRemoteState = async () => {
-    try {
-      const { dieRolls: remoteRolls } = await fetchDieRolls(gameId);
+        // Keep track of the latest known roll to detect new rolls
+        const latestKnownRoll = rolls[0];
 
-      const latest = remoteRolls[0];
+        const syncRemoteState = async () => {
+          try {
+            const { dieRolls: remoteRolls } = await fetchDieRolls(gameId);
 
-      // Check if there's a new roll
-      if (latest && (!latestKnownRoll || latest.id !== latestKnownRoll.id)) {
-        updateRollState(remoteRolls);
+            const latest = remoteRolls[0];
+
+            // Check if there's a new roll
+            if (latest && (!latestKnownRoll || latest.id !== latestKnownRoll.id)) {
+              updateRollState(remoteRolls);
+            }
+
+          } catch (error) {
+            console.error('Error fetching die rolls:', error);
+          }
+        }
+
+        const updateRollState = useCallback((newRolls: DieRolls) => {
+          const lastIndex = newRolls.findIndex((r) => r.id === latestKnownRoll.id)
+
+          // We populate the tray gradually, if all rolls are new, just replace the state
+          if (lastIndex === -1) {
+            return setRolls(newRolls);
+          }
+
+          // If some rolls are new, append them to the existing state with a small delay
+          const rollsToAdd = newRolls.slice(0, lastIndex);
+
+          rollsToAdd.forEach((roll, index) => {
+            setTimeout(() => {
+              setRolls((prevRolls) => [roll, ...prevRolls]);
+            }, index * 250); // Adjust the delay as needed
+          });
+        }, [latestKnownRoll]);
+
+
+
+        useEffect(() => {
+          const interval = setInterval(() => {
+            // syncRemoteState();
+          }, 6000)
+          return () => clearInterval(interval);
+        }, [rolls, gameId, playerId]);
+
+        const allEvents = [...rolls, ...prompts];
+
+        return (
+          <div className='flex flex-col gap-2'>
+            <RollTray gameId={gameId}
+              updateParentRolls={updateRollState}
+            />
+            {mapEventsOnTray(allEvents, playerId)}
+          </div>
+
+        )
       }
 
-    } catch (error) {
-      console.error('Error fetching die rolls:', error);
-    }
-  }
-
-  const updateRollState = useCallback((newRolls: DieRolls) => {
-    const lastIndex = newRolls.findIndex((r) => r.id === latestKnownRoll.id)
-
-    // We populate the tray gradually, if all rolls are new, just replace the state
-    if (lastIndex === -1) {
-      return setRolls(newRolls);
-    }
-
-    // If some rolls are new, append them to the existing state with a small delay
-    const rollsToAdd = newRolls.slice(0, lastIndex);
-
-    rollsToAdd.forEach((roll, index) => {
-      setTimeout(() => {
-        setRolls((prevRolls) => [roll, ...prevRolls]);
-      }, index * 250); // Adjust the delay as needed
-    });
-  }, [latestKnownRoll]);
-
-
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      // syncRemoteState();
-    }, 6000)
-    return () => clearInterval(interval);
-  }, [rolls, gameId, playerId]);
-
-  return (
-    <div className='flex flex-col gap-2'>
-      <RollTray gameId={gameId}
-        updateParentRolls={updateRollState}
-      />
-      {rolls.map((r: DieRoll, index: number) => (
-        <RollItem key={`${r.id}-${r.createdAt}`} roll={r} ownId={playerId} />
-      ))}
-    </div>
-
-  )
-}
-
-export default DiceTray;
+      export default DiceTray;

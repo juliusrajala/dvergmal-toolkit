@@ -1,4 +1,4 @@
-import { db, Game, eq, and, PlayerInGame, Player } from 'astro:db';
+import { and, db, eq, Game, Player,PlayerInGame } from 'astro:db';
 
 export async function createGame(ownerId: number, name: string, secret: string): Promise<number> {
   const [newGame] = await db
