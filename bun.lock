@@ -6,6 +6,8 @@
       "dependencies": {
         "@astrojs/db": "^0.18.0",
         "@astrojs/react": "^4.4.0",
+        "@fontsource-variable/jaro": "^5.2.7",
+        "@fontsource/poppins": "^5.2.7",
         "@tailwindcss/vite": "^4.1.14",
         "@types/react": "^19.2.2",
         "@types/react-dom": "^19.2.1",
@@ -156,6 +158,10 @@
     "@eslint/object-schema": ["@eslint/object-schema@2.1.6", "", {}, "sha512-RBMg5FRL0I0gs51M/guSAj5/e14VQ4tpZnQNWwuDT66P14I43ItmPfIZRhO9fUVIPOAQXU47atlywZ/czoqFPA=="],
 
     "@eslint/plugin-kit": ["@eslint/plugin-kit@0.4.0", "", { "dependencies": { "@eslint/core": "^0.16.0", "levn": "^0.4.1" } }, "sha512-sB5uyeq+dwCWyPi31B2gQlVlo+j5brPlWx4yZBrEaRo/nhdDE8Xke1gsGgtiBdaBTxuTkceLVuVt/pclrasb0A=="],
+
+    "@fontsource-variable/jaro": ["@fontsource-variable/jaro@5.2.7", "", {}, "sha512-DU4hKWdVBX1B3HYv5woCMDOXryWaWzcXS4tCw23Fwm+QoSv5QPUP+a39jGqWQNynn5TZm6qx+AzI67VQ21irhQ=="],
+
+    "@fontsource/poppins": ["@fontsource/poppins@5.2.7", "", {}, "sha512-6uQyPmseo4FgI97WIhA4yWRlNaoLk4vSDK/PyRwdqqZb5zAEuc+Kunt8JTMcsHYUEGYBtN15SNkMajMdqUSUmg=="],
 
     "@humanfs/core": ["@humanfs/core@0.19.1", "", {}, "sha512-5DyQ4+1JEUzejeK1JGICcideyfUbGixgS9jNgex5nqkW+cY7WZhxBigmieN5Qnw9ZosSNVC9KQKyb+GUaGyKUA=="],
 

@@ -70,6 +70,17 @@ export async function joinGameByNameAndSecret(
     throw new Error('Game not found or invalid secret');
   }
 
+  // Check if player is already in the game
+  const [existingPlayer] = await db
+    .select()
+    .from(PlayerInGame)
+    .where(and(eq(PlayerInGame.playerId, playerId), eq(PlayerInGame.gameId, game.id)))
+    .limit(1);
+
+  if (existingPlayer) {
+    throw new Error('You are already a member of this game');
+  }
+
   await db
     .insert(PlayerInGame)
     .values({ playerId, gameId: game.id, joinedAt: new Date(), characterName });

@@ -1,5 +1,6 @@
 ---
 import CreateGameForm from "../../components/CreateGameForm.astro";
+import JoinGameForm from "../../components/JoinGameForm.astro";
 import GameTable from "../../components/GameTable.astro";
 import { getCurrentPlayerId } from "../../db/utils/session";
 import ToolkitLayout from "../../layouts/toolkit.astro";
@@ -13,7 +14,8 @@ if (!user) {
 ---
 
 <ToolkitLayout>
-  <aside class="flex flex-col">
+  <aside class="flex flex-col gap-4">
+    <JoinGameForm />
     <CreateGameForm />
   </aside>
   <section class="flex flex-col flex-1 w-full">

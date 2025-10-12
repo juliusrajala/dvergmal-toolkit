@@ -63,7 +63,7 @@ const mapEventsOnTray = (
     })
     .map(event => 'rollTotal' in event
       ? <RollItem key={`roll-${event.id}-${event.createdAt}`} roll={event} ownId={playerId} />
-      : <PromptItem key={`prompt-${event.id}-${event.createdAt}`} prompt={event} ownId={playerId} />
+      : <PromptItem key={`prompt-${event.id}-${event.createdAt}`} prompt={event} />
     )
 }
 

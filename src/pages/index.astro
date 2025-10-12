@@ -36,7 +36,13 @@ if (request.method === "POST") {
 <Entry>
 	<div class="card max-w-lg bg-base-200 w-full">
 		<form class="card-body gap-5 *:w-full" method="POST">
-			<h1 class="card-title">Sign into Dweomer Toolkit</h1>
+			<h1 class="card-title title font-medium text-xl items-center">
+				<span
+					class="mask mask-decagon bg-primary flex items-center justify-center h-8 w-8 text-xs text-base-200 rotate-12"
+					>20</span
+				>
+				Sign into Dweomer Toolkit
+			</h1>
 			<input
 				placeholder="Email"
 				class="input"
@@ -65,3 +71,12 @@ if (request.method === "POST") {
 		</form>
 	</div>
 </Entry>
+
+<style>
+	body {
+		font-family: "Atkinson Hyperlegible", sans-serif;
+	}
+	.title {
+		font-family: "Jaro Variable", sans-serif;
+	}
+</style>

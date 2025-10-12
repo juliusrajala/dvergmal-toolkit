@@ -23,6 +23,9 @@ const PlayerInGame = defineTable({
     gameId: column.number({ references: () => Game.columns.id }),
     characterName: column.text({ optional: false }),
     joinedAt: column.date(),
+  },
+  indexes: {
+    playerGame: { on: ['playerId', 'gameId'], unique: true }
   }
 })
 

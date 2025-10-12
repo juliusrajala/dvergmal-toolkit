@@ -1,0 +1,42 @@
+---
+import { actions } from "astro:actions";
+
+const result = Astro.getActionResult(actions.joinGameByNameAndSecret);
+
+if (result && !result.error) {
+  // If the game was joined successfully, redirect to the toolkit page
+  Astro.redirect(`/toolkit`);
+}
+---
+
+<div class="card max-w-lg bg-base-200">
+  <form
+    class="card-body"
+    method="POST"
+    action={actions.joinGameByNameAndSecret}
+  >
+    <h2 class="card-title">Join an Existing Game</h2>
+    <input
+      type="text"
+      name="name"
+      placeholder="Game Name"
+      required
+      class="input input-bordered w-full mb-4"
+    />
+    <input
+      type="text"
+      name="secret"
+      placeholder="Joining secret"
+      required
+      class="input input-bordered w-full mb-4"
+    />
+    <input
+      type="text"
+      name="chararacterName"
+      placeholder="Your Character Name"
+      required
+      class="input input-bordered w-full mb-4"
+    />
+    <button type="submit" class="btn btn-primary w-full">Join Game</button>
+  </form>
+</div>
