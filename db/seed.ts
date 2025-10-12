@@ -26,5 +26,6 @@ export default async function seed() {
 
 	// Join the game as a player
 	await joinGameByNameAndSecret(1, 'Dvergmal Campaign', 'supersecret12345!@#', 'Thorin Oakenshield');
+	await joinGameByNameAndSecret(2, 'Seeded Test Game', 'supersecret12345!@#', 'Gandalf the Grey');
 
 }

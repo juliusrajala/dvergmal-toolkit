@@ -2,13 +2,6 @@
 import "../styles/global.css";
 
 import { getCurrentPlayerId } from "../db/utils/session";
-
-const user = await getCurrentPlayerId(Astro.cookies);
-
-if (!user) {
-  console.error("No user logged in, redirecting to /");
-  return Astro.redirect("/");
-}
 ---
 
 <html lang="en" data-theme="coffee">
@@ -27,7 +20,7 @@ if (!user) {
         <a class="link-primary" href="/logout">Logout</a>
       </nav>
     </header>
-    <main class="flex flex-row w-full p-10 gap-5 items-start">
+    <main class="flex flex-row w-full p-3 md:p-10 gap-5 items-start">
       <slot />
     </main>
   </body>

@@ -96,11 +96,36 @@ export async function getPlayerGames(playerId: number) {
 }
 
 export async function getPlayerInGame(playerId: number, gameId: number) {
-  const [playerInGame] = await db
+  const [result] = await db
     .select()
     .from(PlayerInGame)
+    .innerJoin(
+      Game, eq(Game.id, PlayerInGame.gameId)
+    )
     .where(and(eq(PlayerInGame.playerId, playerId), eq(PlayerInGame.gameId, gameId)))
     .limit(1);
 
-  return playerInGame || null;
+  return {
+    ...result.PlayerInGame,
+    isOwner: result.Game.ownerId === playerId
+  };
+}
+
+export async function getPlayersInGame(gameId: number, playerId: number) {
+
+  const playerInGame = await getPlayerInGame(playerId, gameId);
+  if (!playerInGame) {
+    throw new Error('Player is not part of the game');
+  }
+
+  const players = await db
+    .select()
+    .from(PlayerInGame)
+    .innerJoin(Player, eq(Player.id, PlayerInGame.playerId))
+    .where(eq(PlayerInGame.gameId, gameId));
+
+  return players.map(({ PlayerInGame, Player }) => ({
+    ...PlayerInGame,
+    email: Player.email,
+  }));
 }

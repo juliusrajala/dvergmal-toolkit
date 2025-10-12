@@ -46,7 +46,7 @@ const RollPrompt = defineTable({
   columns: {
     id: column.number({ primaryKey: true, unique: true }),
     gameId: column.number({ references: () => Game.columns.id }),
-    playerInGameId: column.number({ references: () => PlayerInGame.columns.id }),
+    playerId: column.number({ references: () => Player.columns.id }),
     prompt: column.text(),
     createdAt: column.date(),
   }

@@ -81,7 +81,9 @@ const DiceTray = ({
 
   return (
     <div className='flex flex-col gap-2'>
-      <RollTray gameId={gameId} />
+      <RollTray gameId={gameId}
+        updateParentRolls={updateRollState}
+      />
       {rolls.map((r: DieRoll, index: number) => (
         <RollItem key={`${r.id}-${r.createdAt}`} roll={r} ownId={playerId} />
       ))}

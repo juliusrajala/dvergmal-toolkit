@@ -18,14 +18,17 @@ const mapDice = (dice: Die[]) => {
   return results;
 }
 
+
 const RollItem = ({ roll, ownId }: Props) => {
   return (
     <div className='flex flex-col w-full border border-base-100 p-3 gap-2 rounded-md'>
-      <div className='text-sm italic'>{roll.player.characterName} rolled {roll.context ? `(${roll.context})` : ''}:</div>
-      <div className='flex flex-row gap-2 items-center'>
+      <div className='text-sm'>{roll.player.characterName} rolled{roll.context ? ` (${roll.context}):` : ':'}</div>
+      <div className='flex flex-row gap-2 items-center flex-wrap'>
         {mapDice(roll.dies)}
-        <span className='font-semibold'>=</span>
-        <div className='badge badge-primary badge-lg font-semibold'>{roll.rollTotal}</div>
+        <span className='flex flex-row gap-2 items-center'>
+          <span className='font-semibold'>=</span>
+          <div className='badge badge-primary badge-lg font-semibold'>{roll.rollTotal}</div>
+        </span>
       </div>
     </div>
   )

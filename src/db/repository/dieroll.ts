@@ -64,7 +64,12 @@ export async function getDierollsInGame(playerId: number, gameId: number): Promi
   const dieRolls = await db
     .select()
     .from(PlayerDieRoll)
-    .innerJoin(PlayerInGame, eq(PlayerDieRoll.playerId, PlayerInGame.playerId))
+    .innerJoin(PlayerInGame,
+      and(
+        eq(PlayerDieRoll.playerId, PlayerInGame.playerId),
+        eq(PlayerDieRoll.gameId, PlayerInGame.gameId)
+      )
+    )
     .where(and(eq(PlayerDieRoll.playerId, playerId), eq(PlayerDieRoll.gameId, gameId)))
     .orderBy(desc(PlayerDieRoll.createdAt))
     .limit(20);
