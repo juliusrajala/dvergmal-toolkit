@@ -32,5 +32,23 @@ export async function signupPlayer(email: string, password: string, invitation: 
 
   const sessionToken = await createSession(playerId);
   return sessionToken;
+}
 
+export async function findPlayerByEmail(email: string) {
+  const players = await db
+    .select()
+    .from(Player)
+    .where(eq(Player.email, email))
+    .limit(1);
+
+  return players[0] || null;
+}
+
+export async function getAllPlayers(count = 10) {
+  const players = await db
+    .select()
+    .from(Player)
+    .limit(count);
+
+  return players;
 }

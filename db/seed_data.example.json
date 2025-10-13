@@ -1,0 +1,16 @@
+{
+    "users": [
+        {
+            "email": "example@user.com",
+            "password": "example123"
+        }
+    ],
+    "games": [
+        {
+            "name": "Test Game",
+            "secret": "secret_invitation_code",
+            "ownerEmail": "example@user.com",
+            "joinAll": true
+        }
+    ]
+}
