@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        DB_PEPPER: ${DB_PEPPER}
+        INVITATION_CODE: ${INVITATION_CODE}
+    ports:
+      - "4321:4321"
+    environment:
+      - NODE_ENV=production
+      - HOST=0.0.0.0
+      - PORT=4321
+      - DB_PEPPER=${DB_PEPPER}
+      - INVITATION_CODE=${INVITATION_CODE}
+    volumes:
+      # Mount a volume for the database to persist data
+      - astro-db:/app/.astro
+    restart: unless-stopped
+
+volumes:
+  astro-db:

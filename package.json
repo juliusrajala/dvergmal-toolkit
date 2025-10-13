@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@astrojs/db": "^0.18.0",
+    "@astrojs/node": "^9.4.6",
     "@astrojs/react": "^4.4.0",
     "@fontsource-variable/jaro": "^5.2.7",
     "@fontsource/poppins": "^5.2.7",

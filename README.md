@@ -1,43 +1,79 @@
-# Astro Starter Kit: Minimal
+# Dvergmal Roleplaying Toolkit
 
+Provides a pretty simple dice-roller + prompter toolkit for remote roleplaying. You can run this locally or hosted somewhere.
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="45%">
+      <img src="screenshots/rolltray.png" alt="Roll Tray" />
+      <p align="center"><em>Dice Rolling Interface</em></p>
+    </td>
+    <td width="45%">
+      <img src="screenshots/menu.png" alt="Menu" />
+      <p align="center"><em>Game Menu</em></p>
+    </td>
+  </tr>
+</table>
+
+## Setup
+
+### Option 1: Using Bun (Local Development)
+
+1. Install dependencies:
 ```sh
-bun create astro@latest -- --template minimal
+bun install
 ```
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
-
-## 🚀 Project Structure
-
-Inside of your Astro project, you'll see the following folders and files:
-
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
+2. Set up your environment variables:
+```sh
+cp .env.example .env
+# Edit .env with your secret values
 ```
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+3. Set up seed data (optional, for initial users and games):
+```sh
+cp db/seed_data.example.json db/seed_data.json
+# Edit db/seed_data.json to add your initial users and games
+```
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+The seed data format:
+- `users`: Array of users with `email` and `password`
+- `games`: Array of games with `name`, `secret` (invitation code), `ownerEmail`, and `joinAll` (boolean to auto-join all users)
 
-Any static assets, like images, can be placed in the `public/` directory.
+4. Start the development server:
+```sh
+bun dev
+```
 
-## 🧞 Commands
+### Option 2: Using Docker
 
-All commands are run from the root of the project, from a terminal:
+1. Build and run with Docker:
+```sh
+docker build -t dvergmal-toolkit .
+docker run -p 4321:4321 \
+  -e DB_PEPPER="your-secret-pepper" \
+  -e INVITATION_CODE="your-invite-code" \
+  dvergmal-toolkit
+```
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `bun install`             | Installs dependencies                            |
-| `bun dev`             | Starts local dev server at `localhost:4321`      |
-| `bun build`           | Build your production site to `./dist/`          |
-| `bun preview`         | Preview your build locally, before deploying     |
-| `bun astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `bun astro -- --help` | Get help using the Astro CLI                     |
+2. Or use Docker Compose:
+```sh
+# Copy and edit environment variables
+cp .env.docker .env.docker.local
+# Edit .env.docker.local with your values
 
-## 👀 Want to learn more?
+# Build and run
+docker-compose --env-file .env.docker.local up -d
+```
 
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+The application will be available at `http://localhost:4321`
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+You are free to use, modify, and distribute this software for any purpose, including commercial use, as long as you include the original copyright notice and license.

@@ -14,7 +14,7 @@ const PromptItem = ({ prompt }: Props) => {
       </div>
       {unansweredCharacters.length > 0 && (
         <div className=''>
-          {unansweredCharacters.join(', ').concat('should respond with a roll!')}
+          {unansweredCharacters.join(', ').concat(' should respond with a roll!')}
         </div>
       )}
       {prompt.relatedDieRolls.length > 0 && (
