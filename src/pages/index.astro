@@ -21,14 +21,15 @@ if (request.method === "POST") {
 		error = "Email and password are required.";
 	} else if (password.length < 8) {
 		error = "Password must be at least 8 characters long.";
-	}
-	try {
-		const playerSession = await loginPlayer(email, password);
-		setSessionCookie(Astro.cookies, playerSession);
-		return Astro.redirect("/toolkit");
-	} catch (e) {
-		console.error("Error logging in:", e);
-		error = "Invalid email or password.";
+	} else {
+		try {
+			const playerSession = await loginPlayer(email, password);
+			setSessionCookie(Astro.cookies, playerSession);
+			return Astro.redirect("/toolkit");
+		} catch (e) {
+			console.error("Error logging in:", e);
+			error = "Invalid email or password.";
+		}
 	}
 }
 ---
@@ -58,6 +59,7 @@ if (request.method === "POST") {
 				id="password"
 				name="password"
 				required
+				minlength="8"
 			/>
 			{error && <p class="text-error">{error}</p>}
 			<div class="card-actions justify-between">

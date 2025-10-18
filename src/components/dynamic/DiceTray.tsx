@@ -105,7 +105,7 @@ const DiceTray = ({
   }
 
   const updateRollState = useCallback((newRolls: DieRolls) => {
-    const lastIndex = newRolls.findIndex((r) => r.id === latestKnownRoll.id)
+    const lastIndex = newRolls.findIndex((r) => r.id === latestKnownRoll?.id);
 
     // We populate the tray gradually, if all rolls are new, just replace the state
     if (lastIndex === -1) {
