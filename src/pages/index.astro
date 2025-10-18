@@ -2,83 +2,85 @@
 import { loginPlayer } from "../db/repository/session";
 import { getCurrentPlayerId, setSessionCookie } from "../db/utils/session";
 import Entry from "../layouts/entry.astro";
-const { request } = Astro;
+import { postHandler } from "../utils/routing";
 
 // Check if user is already logged in
 const user = await getCurrentPlayerId(Astro.cookies);
 if (user) {
-	return Astro.redirect("/toolkit");
+  return Astro.redirect("/toolkit");
 }
 
 let error: string | null = null;
 
-if (request.method === "POST") {
-	const formData = await request.formData();
-	const email = formData.get("email")?.toString() || "";
-	const password = formData.get("password")?.toString() || "";
+await postHandler(Astro.request, async (request: Request) => {
+  const formData = await request.formData();
+  const email = formData.get("email")?.toString() || "";
+  const password = formData.get("password")?.toString() || "";
 
-	if (!email || !password) {
-		error = "Email and password are required.";
-	} else if (password.length < 8) {
-		error = "Password must be at least 8 characters long.";
-	} else {
-		try {
-			const playerSession = await loginPlayer(email, password);
-			setSessionCookie(Astro.cookies, playerSession);
-			return Astro.redirect("/toolkit");
-		} catch (e) {
-			console.error("Error logging in:", e);
-			error = "Invalid email or password.";
-		}
-	}
-}
+  if (!email || !password) {
+    error = "Email and password are required.";
+    return;
+  } else if (password.length < 8) {
+    error = "Password must be at least 8 characters long.";
+    return;
+  }
+
+  try {
+    const playerSession = await loginPlayer(email, password);
+    setSessionCookie(Astro.cookies, playerSession);
+    return Astro.redirect("/toolkit");
+  } catch (e) {
+    console.error("Error logging in:", e);
+    error = "Invalid email or password.";
+  }
+});
 ---
 
 <Entry>
-	<div class="card max-w-lg bg-base-200 w-full">
-		<form class="card-body gap-5 *:w-full" method="POST">
-			<h1 class="card-title title font-medium text-xl items-center">
-				<span
-					class="mask mask-decagon bg-primary flex items-center justify-center h-8 w-8 text-xs text-base-200 rotate-12"
-					>20</span
-				>
-				Sign into Dweomer Toolkit
-			</h1>
-			<input
-				placeholder="Email"
-				class="input"
-				type="email"
-				id="email"
-				name="email"
-				required
-			/>
-			<input
-				placeholder="Password"
-				class="input"
-				type="password"
-				id="password"
-				name="password"
-				required
-				minlength="8"
-			/>
-			{error && <p class="text-error">{error}</p>}
-			<div class="card-actions justify-between">
-				<a class="btn btn-secondary btn-ghost" href="/signup"
-					>Sign up with invitation</a
-				>
-				<button class="btn btn-primary" type="submit"
-					>Sign in with your account</button
-				>
-			</div>
-		</form>
-	</div>
+  <div class="card max-w-lg bg-base-200 w-full">
+    <form class="card-body gap-5 *:w-full" method="POST">
+      <h1 class="card-title title font-medium text-xl items-center">
+        <span
+          class="mask mask-decagon bg-primary flex items-center justify-center h-8 w-8 text-xs text-base-200 rotate-12"
+          >20</span
+        >
+        Sign into Dweomer Toolkit
+      </h1>
+      <input
+        placeholder="Email"
+        class="input"
+        type="email"
+        id="email"
+        name="email"
+        required
+      />
+      <input
+        placeholder="Password"
+        class="input"
+        type="password"
+        id="password"
+        name="password"
+        required
+        minlength="8"
+      />
+      {error && <p class="text-error">{error}</p>}
+      <div class="card-actions justify-between">
+        <a class="btn btn-secondary btn-ghost" href="/signup"
+          >Sign up with invitation</a
+        >
+        <button class="btn btn-primary" type="submit"
+          >Sign in with your account</button
+        >
+      </div>
+    </form>
+  </div>
 </Entry>
 
 <style>
-	body {
-		font-family: "Atkinson Hyperlegible", sans-serif;
-	}
-	.title {
-		font-family: "Jaro Variable", sans-serif;
-	}
+  body {
+    font-family: "Atkinson Hyperlegible", sans-serif;
+  }
+  .title {
+    font-family: "Jaro Variable", sans-serif;
+  }
 </style>
