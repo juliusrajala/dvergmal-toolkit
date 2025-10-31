@@ -25,7 +25,14 @@ const players = await getPlayersInGame(gameId, userId);
                 .join("")}
             </span>
           </td>
-          <td>{player.characterName}</td>
+          <td>
+            <a
+              class="link"
+              href={`/toolkit/game/${gameId}/characters/${player.playerId}`}
+            >
+              {player.characterName}
+            </a>
+          </td>
         </tr>
       ))
     }
