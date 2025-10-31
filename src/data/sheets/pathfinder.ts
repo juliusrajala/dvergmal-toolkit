@@ -1,4 +1,6 @@
-export const PATHFINDER_1_SHEET = {
+import type { Sheet } from "./validator";
+
+export const PATHFINDER_1_SHEET: Sheet = {
   title: "Pathfinder 1e — Character Sheet",
   system: "pf1e",
   groups: [
