@@ -4,8 +4,8 @@ import { getCurrentPlayerId } from "../../../../db/utils/session";
 import { TestController } from "../../../../interactor/GameInteractor";
 
 export const POST: APIRoute = async ({ cookies, request }) => {
-  const body = await request.json();
   const playerId = await getCurrentPlayerId(cookies);
+  const body = await request.json();
   console.log("PlayerId", playerId, "body", body);
 
   const gameController = TestController.getInstance();
@@ -13,7 +13,11 @@ export const POST: APIRoute = async ({ cookies, request }) => {
   return new Response(null, { status: 204 });
 };
 
-export const GET: APIRoute = async ({ request }) => {
+export const GET: APIRoute = async ({ cookies, request }) => {
+  const playerId = await getCurrentPlayerId(cookies);
+  if (!playerId) {
+    return new Response(null, { status: 401 });
+  }
   const encoder = new TextEncoder();
 
   const customReadable = new ReadableStream({
@@ -40,7 +44,7 @@ export const GET: APIRoute = async ({ request }) => {
       };
 
       // Subscribe to new messages
-      gameController.subscribe(sendEvent);
+      gameController.subscribe(playerId, sendEvent);
       const ping = setInterval(() => write(`: ping\n\n`), 15000);
 
       const cleanup = () => {
@@ -48,7 +52,7 @@ export const GET: APIRoute = async ({ request }) => {
         closed = true;
         clearInterval(ping);
         // Important: unsubscribe using the *same* function reference
-        gameController.unsubscribe(sendEvent);
+        gameController.unsubscribe(playerId, sendEvent);
         try {
           controller.close();
         } catch {

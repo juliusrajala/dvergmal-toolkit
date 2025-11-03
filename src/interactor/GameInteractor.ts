@@ -21,6 +21,7 @@ export class TestController {
   private constructor() {}
 
   private messages: string[] = [];
+  private listeners = new Map<number, CallbackFn>();
 
   static getInstance(): TestController {
     if (!TestController.instance) {
@@ -29,13 +30,21 @@ export class TestController {
     return TestController.instance;
   }
 
-  public subscribe(callback: CallbackFn): void {
-    console.log("Subscribed", this.emitter.listenerCount("message"));
+  // We'll want to expand this to create connections per game
+  public subscribe(playerId: number, callback: CallbackFn): void {
+    console.log("Subscribing player", playerId);
+    const existing = this.listeners.get(playerId);
+    if (existing) {
+      this.emitter.off("message", existing);
+    }
+
+    this.listeners.set(playerId, callback);
     this.emitter.on("message", callback);
   }
 
-  public unsubscribe(callback: CallbackFn): void {
-    console.log("Unsubscribed", this.emitter.listenerCount("message"));
+  public unsubscribe(playerId: number, callback: CallbackFn): void {
+    console.log("Unsubscribing player", playerId);
+    this.listeners.delete(playerId);
     this.emitter.off("message", callback);
   }
 
