@@ -1,63 +1,71 @@
 import type { APIRoute } from "astro";
-import EventEmitter from "events";
 
-class TestController {
-  private static instance: TestController;
-  private emitter = new EventEmitter();
+import { getCurrentPlayerId } from "../../../../db/utils/session";
+import { TestController } from "../../../../interactor/GameInteractor";
 
-  private constructor() {}
+export const POST: APIRoute = async ({ cookies, request }) => {
+  const body = await request.json();
+  const playerId = await getCurrentPlayerId(cookies);
+  console.log("PlayerId", playerId, "body", body);
 
-  private messages: string[] = [];
+  const gameController = TestController.getInstance();
+  gameController.addMessage("Test");
+  return new Response(null, { status: 204 });
+};
 
-  static getInstance(): TestController {
-    if (!TestController.instance) {
-      TestController.instance = new TestController();
-    }
-    return TestController.instance;
-  }
+export const GET: APIRoute = async ({ request }) => {
+  const encoder = new TextEncoder();
 
-  public subscribe(callback: (message: string) => void): void {
-    this.emitter.on("message", callback);
-  }
-
-  public unsubscribe(callback: (message: string) => void): void {
-    this.emitter.off("message", callback);
-  }
-
-  public addMessage(message: string): void {
-    this.messages.push(message);
-    this.emitter.emit("message", message);
-  }
-
-  public getMessages() {
-    return this.messages;
-  }
-}
-
-export const GET: APIRoute = ({ request }) => {
   const customReadable = new ReadableStream({
     start(controller) {
-      const encoder = new TextEncoder();
+      const gameController = TestController.getInstance();
+      console.log("Controller started");
 
-      const sendEvent = (data: string) => {
-        const message = `data: ${JSON.stringify(data)}\n\n`;
-        controller.enqueue(encoder.encode(message));
+      let closed = false;
+
+      const write = (chunk: string) => {
+        if (closed) return; // prevent writes-after-close
+        try {
+          controller.enqueue(encoder.encode(chunk));
+        } catch {
+          // If the controller is already closed, just stop trying to write.
+          closed = true;
+        }
+      };
+
+      const sendEvent = (msg: "roll" | "prompt") => {
+        console.log(msg, new Date());
+        // SSE frame (you can also add "event: <name>\n" if you want named events)
+        write(`data: ${msg}\n\n`);
       };
 
       // Subscribe to new messages
-      TestController.getInstance().subscribe(sendEvent);
+      gameController.subscribe(sendEvent);
+      const ping = setInterval(() => write(`: ping\n\n`), 15000);
 
-      request.signal.addEventListener("abort", () => {
-        // Unsubscribe from new messages
-        TestController.getInstance().unsubscribe(sendEvent);
-        controller.close();
-      });
+      const cleanup = () => {
+        if (closed) return;
+        closed = true;
+        clearInterval(ping);
+        // Important: unsubscribe using the *same* function reference
+        gameController.unsubscribe(sendEvent);
+        try {
+          controller.close();
+        } catch {
+          /* already closed */
+        }
+      };
+
+      request.signal.addEventListener("abort", cleanup);
+    },
+    cancel() {
+      console.log("Cancel called");
     },
   });
   return new Response(customReadable, {
     headers: {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache",
+      "Content-Type": "text/event-stream; charset=utf-8",
+      "Cache-Control": "no-cache, no-transform",
       Connection: "keep-alive",
     },
   });

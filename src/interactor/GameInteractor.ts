@@ -1,28 +1,50 @@
-import type { AstroCookies, AstroGlobal } from "astro";
+import { EventEmitter } from "events";
 
-import { type DieRoll, getDierollsInGame } from "../db/repository/dieroll";
-import { getPromptsWithRelatedRolls, type PromptWithRelatedRolls } from "../db/repository/prompts";
-import { getCurrentPlayerId } from "../db/utils/session";
+// import {
+//   type Die,
+//   type DieRoll,
+//   getDierollsInGame,
+// } from "../db/repository/dieroll";
+// import {
+//   getPromptsWithRelatedRolls,
+//   type PromptWithRelatedRolls,
+// } from "../db/repository/prompts";
+// import { getCurrentPlayerId } from "../db/utils/session";
+// import type { DieType } from "../tools/dice";
 
-export class GameInteractor {
-  private static instance: GameInteractor;
-  gameId: number;
+type CallbackFn = (msg: "roll" | "prompt") => void;
 
-  constructor({ gameId }: { gameId: number }) {
-    this.gameId = gameId
-  }
+export class TestController {
+  private static instance: TestController;
+  private emitter = new EventEmitter();
 
-  async getEvents(cookies: AstroCookies): Promise<Array<DieRoll | PromptWithRelatedRolls>> {
-    const userId = await getCurrentPlayerId(cookies);
-    if (!userId) {
-      throw Error('Invalid user session');
+  private constructor() {}
+
+  private messages: string[] = [];
+
+  static getInstance(): TestController {
+    if (!TestController.instance) {
+      TestController.instance = new TestController();
     }
-    const dieRolls = await getDierollsInGame(userId, this.gameId);
-    const prompts = await getPromptsWithRelatedRolls(userId, this.gameId);
-    return [...dieRolls, ...prompts].toSorted((a, b) => a.createdAt.getTime() - b.createdAt.getTime())
+    return TestController.instance;
   }
 
-  static getInstance() {
-    return this.instance
+  public subscribe(callback: CallbackFn): void {
+    console.log("Subscribed", this.emitter.listenerCount("message"));
+    this.emitter.on("message", callback);
+  }
+
+  public unsubscribe(callback: CallbackFn): void {
+    console.log("Unsubscribed", this.emitter.listenerCount("message"));
+    this.emitter.off("message", callback);
+  }
+
+  public addMessage(message: string): void {
+    this.messages.push(message);
+    this.emitter.emit("message", message);
+  }
+
+  public getMessages() {
+    return this.messages;
   }
 }
