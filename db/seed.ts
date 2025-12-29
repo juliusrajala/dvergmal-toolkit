@@ -1,6 +1,7 @@
 import { getSecret } from "astro:env/server";
 
 import { createGame, joinGameByNameAndSecret } from "../src/db/repository/game";
+import { createNote } from "../src/db/repository/note";
 import { findPlayerByEmail, getAllPlayers } from "../src/db/repository/player";
 import { signupAndCreateSession } from "../src/db/repository/session";
 import seed_data from "./seed_data.json";
@@ -8,6 +9,7 @@ import seed_data from "./seed_data.json";
 type SeedData = typeof seed_data;
 const users = (seed_data as SeedData).users;
 const games = (seed_data as SeedData).games;
+const notes = (seed_data as SeedData).notes;
 
 const characterNames = [
   "Gandalf the Grey",
@@ -64,5 +66,16 @@ export default async function seed() {
         );
       }
     }
+  }
+
+  for await (const note of notes) {
+    const { id: ownerId } = await findPlayerByEmail(note.ownerEmail);
+    if (!ownerId) {
+      console.warn(
+        `Owner with email ${note.ownerEmail} not found, skipping note ${note.title}`,
+      );
+      continue;
+    }
+    await createNote(ownerId, note.note, note.title);
   }
 }

@@ -12,5 +12,12 @@
             "ownerEmail": "example@user.com",
             "joinAll": true
         }
+    ],
+    "notes": [
+        {
+            "ownerEmail": "example@user.com",
+            "title": "Beldyl - Queen of the Duergar",
+            "note": "The queen of the Duergar under the mountains. Known to be merciless."
+        }
     ]
 }
