@@ -71,10 +71,39 @@ export const Session = defineTable({
   }
 })
 
+export const Note = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, unique: true }),
+    playerId: column.number({ references: () => Player.columns.id }),
+    createdAt: column.date(),
+    note: column.text(),
+    title: column.text({ optional: true }),
+    imgSrc: column.text({ optional: true }),
+    gameId: column.number({ references: () => Game.columns.id, optional: true })
+  }
+})
+
+export const ShareNoteEvent = defineTable({
+  columns: {
+    id: column.number({ primaryKey: true, unique: true }),
+    noteId: column.number({ references: () => Note.columns.id }),
+    gameId: column.number({ references: () => Game.columns.id }),
+    playerId: column.number({ references: () => Game.columns.id, optional: true }),
+    sharedAt: column.date()
+  }
+})
+
 // https://astro.build/db/config
 export default defineDb({
   tables: {
-    Game, Player, Password, Session
-    , PlayerInGame, PlayerDieRoll, RollPrompt
+    Game,
+    Note,
+    Password,
+    Player,
+    PlayerDieRoll,
+    PlayerInGame,
+    RollPrompt,
+    Session,
+    ShareNoteEvent
   }
 })
