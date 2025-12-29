@@ -1,22 +1,8 @@
-import { type APIRoute, type AstroCookies } from 'astro';
+import { type APIRoute } from 'astro';
 
 import { createDieRoll, getDierollsInGame } from '../../../../db/repository/dieroll';
-import { getCurrentPlayerId } from '../../../../db/utils/session';
+import { validateEndpoints } from '../../../../db/utils/validation';
 import { rollDice } from '../../../../tools/dice';
-
-const validateEndpoints = async (cookies: AstroCookies, gameId?: string) => {
-  const gameIdAsNumber = Number(gameId);
-  if (!gameId || isNaN(gameIdAsNumber)) {
-    throw new Error('Invalid game ID');
-  }
-  const playerId = await getCurrentPlayerId(cookies);
-
-  if (!playerId) {
-    throw new Error('Not authenticated');
-  }
-
-  return { playerId, gameIdAsNumber };
-}
 
 export const GET: APIRoute = async ({ cookies, params }) => {
   try {
