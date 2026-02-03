@@ -11,6 +11,7 @@ import PlayersInGame from "../../../components/PlayersInGame.astro";
 import OwnerSidebar from "../../../components/OwnerSidebar.astro";
 import { actions } from "astro:actions";
 import { getPromptsWithRelatedRolls } from "../../../db/repository/prompts";
+import OwnerSendNoteListTest from "../../../components/OwnerSendNoteListTest.astro";
 
 const gameId = Astro.params.gameId;
 const userId = await getCurrentPlayerId(Astro.cookies);
@@ -42,13 +43,14 @@ const prompts = await getPromptsWithRelatedRolls(userId, Number(gameId));
 ---
 
 <Toolkit>
-  <div class="card max-w-md flex-1 bg-base-200 hidden md:flex">
+  <div class="card max-w-md flex-1 bg-base-200 hidden md:flex mb-80">
     <div class="card-body">
       <h1 class="card-title">{game.name}</h1>
-
       {
         gameStatus.isOwner ? (
           <OwnerSidebar gameId={Number(gameId)} />
+          <div class="divider"/>
+          <OwnerSendNoteListTest gameId={Number(gameId)} userId={userId} />
         ) : (
           <PlayersInGame gameId={Number(gameId)} />
         )
