@@ -12,48 +12,55 @@ if (!userId) {
   return Astro.redirect("/");
 }
 
+const newNote = !note;
+
+const getId = () => newNote ? 'new-note' : note.id;
+
 ---
 
 <div class="absolute card w-200 h-fit bg-base-200 rounded-tl-none border-2">
-  <form class="card-body" action={actions.updateNote} method="POST">
-    <input type="hidden" name="id" value={note.id} />
-    <input type="hidden" name="gameId" value={gameId} />
+  <form class="card-body" action={newNote ? actions.createNote : actions.updateNote} method="POST">
+    <input type="hidden" name="id" value={getId()} />
+    <input type="hidden" name="gameId" value={newNote ? gameId : note.gameId} />
     {/* HEADER LINE  */}
     <div class="flex justify-between mb-2">
       <div class="group/title w-full mr-4 focus:outline-0" contenteditable="true">
-        <h1 class="card-title pb-2 border-b-1 group-focus-within/title:hidden" id={`titleTarget-${note.id}`}>{note.title}</h1>
+        <h1 class={"card-title pb-2 border-b-1 " + (newNote ? "hidden" : "group-focus-within/title:hidden")} id={`titleTarget-${getId()}`}>{note?.title}</h1>
         <input 
         type="text"
         name="title"
-        id={`titleInput-${note.id}`}
+        id={`titleInput-${getId()}`}
         placeholder="Title"
-        value={note.title}
-        class={"input input-bordered input-sm w-140 hidden group-focus-within/title:flex"}/>
+        value={note?.title}
+        class={"input input-bordered input-sm w-140 " + (newNote ? "flex w-170" : "hidden group-focus-within/title:flex")}/>
       </div>
       <div class="flex align-middle mb-2">
-        <div class="tooltip" data-tip="Save note">
-          <button type="submit" id={`saveNote-${note.id}`} class="btn btn-circle btn-primary w-8 h-8 mr-4" disabled><img class="w-6 h-6" src="/icons/save.svg"/></button>
+        <div class="tooltip" data-tip={newNote ? "Create note" : "Save note"}>
+          <button type="submit" id={`saveNote-${getId()}`} class="btn btn-circle btn-primary w-8 h-8 mr-4" disabled><img class="w-6 h-6" src="/icons/save.svg"/></button>
         </div>
-        <DeleteNoteButton id={note.id} client:only="/"/>
-        <div class="tooltip" data-tip="Share note to game">
-          <a type="button" href={`/toolkit/game/${gameId}`} class="btn btn-circle btn-primary w-8 h-8 mr-4"><img class="w-6 h-6" src="/icons/triangle_right.svg"/></a>
-        </div>
+        {
+          !newNote &&
+          <DeleteNoteButton id={note.id} client:only="/"/>
+          <div class="tooltip" data-tip="Share note to game">
+            <a type="button" href={`/toolkit/game/${gameId}`} class="btn btn-circle btn-primary w-8 h-8 mr-4"><img class="w-6 h-6" src="/icons/triangle_right.svg"/></a>
+          </div>
+        }
       </div>
     </div>
       
     {/* CONTENT */}
     <div class="flex w-full justify-between">
       <div class={"group/note focus:outline-0 w-full"} contenteditable="true"> <!-- TODO: Once img can be given switch to w-7/11 -->
-        <p class="max-h-80 overflow-auto whitespace-pre-wrap group-focus-within/note:hidden" id=`noteTarget-${note.id}`>{note.note}</p>
+        <p class={"max-h-80 overflow-auto whitespace-pre-wrap " + (newNote ? "hidden" : "group-focus-within/note:hidden")} id=`noteTarget-${getId()}`>{note?.note}</p>
         <textarea 
         name="note"
-        id=`noteInput-${note.id}`
+        id=`noteInput-${getId()}`
         placeholder="Note"
-        class="input input-bordered input-sm w-full h-80 overflow-auto hidden group-focus-within/note:flex">{note.note}</textarea>
+        class={"input input-bordered input-sm w-full h-80 overflow-auto " + (newNote ? "flex" : "hidden group-focus-within/note:flex")}>{note?.note}</textarea>
       </div>
       <!-- TODO: Implement notes with images below -->
       {
-        note.imgSrc &&
+        note?.imgSrc &&
         <div class="flex flex-col w-4/11 items-end">
           <img class="w-6 h-6" src={note.imgSrc} />
         </div>

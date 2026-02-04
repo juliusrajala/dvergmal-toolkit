@@ -1,11 +1,9 @@
 ---
-// import { actions } from "astro:actions";
+import { actions } from 'astro:actions';
 import { getOwnedNotes } from "../db/repository/note";
 import { getCurrentPlayerId } from "../db/utils/session";
 import type { Note } from "../db/repository/note";
 import NoteViewModal from "./NoteViewModal.astro";
-import AddNoteButton from "./dynamic/AddNoteButton";
-// import EditNoteModal from "./EditNoteModal.astro";
 
 const gameId = Astro.props.gameId;
 
@@ -20,6 +18,15 @@ const noteTitle = (note: Note) => {
   const useTitle = note.title ?? note.note;
   return useTitle.length > 43 ? useTitle.substring(0, 40) + '...' : useTitle;
 }
+
+const checkForError = () => {
+  let result = Astro.getActionResult(actions.createNote);
+  if (result && result.error) { return result.error.message; }
+  result = Astro.getActionResult(actions.updateNote);
+  if (result && result.error) { return result.error.message; }
+  return undefined;
+}
+const error = checkForError();
 
 ---
 
@@ -42,7 +49,21 @@ const noteTitle = (note: Note) => {
     ))
     : <div class="flex w-full mb-4"><span class="w-full italic text-center">NO NOTES YET</span></div>
   }
-  <div class="flex w-full justify-center"><AddNoteButton client:only="/"/></div>
+  <!-- ADD NEW NOTE -->
+  <div class="group flex w-full mb-3">
+    <div class="btn btn-primary btn-md flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2 group-hover:rounded-none">
+      <div class="flex justify-center w-full group-hover:w-19/20"><img class="w-6 h-6" src="/icons/plus.svg"/></div>
+      <span class="ml-1 hidden group-hover:inline">{'>'}</span>
+    </div>
+    <div class="relative z-1 hidden group-hover:inline">
+      <NoteViewModal gameId={Number(gameId)} />
+    </div>
+  </div>
+
+  {
+    error &&
+    <p>{error}</p>
+  }
 
   <!--
     NOTE:
@@ -77,13 +98,15 @@ const noteTitle = (note: Note) => {
       inputElem.addEventListener('change', () => { checkInputClasses(inputElem, targetElem, changesDict, input, noteId); });
     }
 
+    const changes = {
+      values: {},
+      keys: []
+    };
     for (const note of dmNotes) {
-      const changes = {
-        values: {},
-        keys: []
-      };
       listenForInputChange(`titleInput-${note.id}`, `titleTarget-${note.id}`, changes, note.id);
       listenForInputChange(`noteInput-${note.id}`, `noteTarget-${note.id}`, changes, note.id);
     }
+    listenForInputChange(`titleInput-new-note`, `titleTarget-new-note`, changes, 'new-note');
+    listenForInputChange(`noteInput-new-note`, `noteTarget-new-note`, changes, 'new-note');
   </script>
 </div>
