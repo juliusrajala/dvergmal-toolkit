@@ -37,12 +37,12 @@ const error = checkForError();
     ? dmNotes.map((note) =>  (
       <div class="group flex w-full mb-3">
       {/* LIST ITEM */}
-        <div class="flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2">
-          <span class="text-center w-full group-hover:w-19/20">{noteTitle(note)}</span>
-          <span class="ml-1 hidden group-hover:inline">{'>'}</span>
+        <div class="flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2 group-focus-within:border-t-2 group-focus-within:border-l-2">
+          <span class="text-center w-full group-hover:w-19/20 group-focus-within:w-19/20">{noteTitle(note)}</span>
+          <span class="ml-1 hidden group-hover:inline group-focus-within:inline">{'>'}</span>
         </div>
         {/* ON HOVER MODAL */}
-        <div class="relative z-1 hidden group-hover:inline">
+        <div class="relative z-1 hidden group-hover:inline group-focus-within:inline">
           <NoteViewModal gameId={Number(gameId)} note={note} />
         </div>
       </div>
@@ -51,11 +51,15 @@ const error = checkForError();
   }
   <!-- ADD NEW NOTE -->
   <div class="group flex w-full mb-3">
-    <div class="btn btn-primary btn-md flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2 group-hover:rounded-none">
-      <div class="flex justify-center w-full group-hover:w-19/20"><img class="w-6 h-6" src="/icons/plus.svg"/></div>
-      <span class="ml-1 hidden group-hover:inline">{'>'}</span>
+    <div 
+      class="
+        btn btn-primary btn-md flex justify-between w-full p-1 border-b-2
+        group-hover:border-t-2 group-hover:border-l-2 group-hover:rounded-none 
+        group-focus-within:border-t-2 group-focus-within:border-l-2 group-focus-within:rounded-none">
+      <div class="flex justify-center w-full group-hover:w-19/20 group-focus-within:w-19/20"><img class="w-6 h-6" src="/icons/plus.svg"/></div>
+      <span class="ml-1 hidden group-hover:inline group-focus-within:inline">{'>'}</span>
     </div>
-    <div class="relative z-1 hidden group-hover:inline">
+    <div class="relative z-1 hidden group-hover:inline group-focus-within:inline">
       <NoteViewModal gameId={Number(gameId)} />
     </div>
   </div>
