@@ -89,7 +89,7 @@ export async function shareNoteInGame(noteId: number, gameId: number, playerIds?
 
   // Map the events into insert queries and run them as a batch
   const queries = events.map(event => db.insert(ShareNoteEvent).values(event).returning({ id: ShareNoteEvent.id }));
-  // NOTE: This is because the argument for .batch() is expected to be ensured at the type level to not be empty. See https://github.com/withastro/astro/issues/11865.
+  // NOTE: Formatting below is because the argument for .batch() is expected to be ensured at the type level to not be empty. See https://github.com/withastro/astro/issues/11865.
   const [firstQuery, ...restOfQueries] = queries;
   const sharedEventIdList = (await db.batch([firstQuery, ...restOfQueries])).map(val => (val[0]).id);
   if (!sharedEventIdList?.length) { throw new Error('Failed to share any notes for game ' + gameId); }
@@ -126,4 +126,18 @@ export async function deleteNote(id: number): Promise<boolean> {
   ]);
   if (!result) { throw new Error('Couldn\'t delete note from DB'); }
   return true;
+}
+
+/**
+ * Check that the player owns the note in question
+ * @param id Note to be checked
+ * @param playerId Player to be checked
+ * @returns true if the player owns the note in question
+ */
+export async function checkNoteOwnership(id: number, playerId: number): Promise<boolean> {
+  const [result] = await db
+    .select()
+    .from(Note)
+    .where(and(eq(Note.id, id), eq(Note.playerId, playerId))) as Note[];
+  return !!result;
 }
