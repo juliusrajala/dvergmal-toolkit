@@ -35,7 +35,7 @@ const error = checkForError();
   {
     dmNotes.length
     ? dmNotes.map((note) =>  (
-      <div class="group flex w-full mb-3">
+      <div class="group flex w-full mb-3 note-item" id={`note-${note.id}`}>
       {/* LIST ITEM */}
         <div class="flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2 group-focus-within:border-t-2 group-focus-within:border-l-2">
           <span class="text-center w-full group-hover:w-19/20 group-focus-within:w-19/20">{noteTitle(note)}</span>
@@ -50,7 +50,7 @@ const error = checkForError();
     : <div class="flex w-full mb-4"><span class="w-full italic text-center">NO NOTES YET</span></div>
   }
   <!-- ADD NEW NOTE -->
-  <div class="group flex w-full mb-3">
+  <div class="group flex w-full mb-3 note-item" id="note-new-note">
     <div 
       class="
         btn btn-primary btn-md flex justify-between w-full p-1 border-b-2

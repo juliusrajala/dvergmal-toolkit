@@ -18,7 +18,7 @@ const getId = () => newNote ? 'new-note' : note.id;
 
 ---
 
-<div class="absolute card w-200 h-fit bg-base-200 rounded-tl-none border-2">
+<div class="absolute card w-200 h-fit bg-base-200 rounded-tl-none border-2" onfocusin=`setEditMode(true, ${getId()})` onfocusout=`setEditMode(false, ${getId()})`>
   <form class="card-body" action={newNote ? actions.createNote : actions.updateNote} method="POST">
     <input type="hidden" name="id" value={getId()} />
     <input type="hidden" name="gameId" value={newNote ? gameId : note.gameId} />
@@ -53,10 +53,10 @@ const getId = () => newNote ? 'new-note' : note.id;
       <div class={"group/note focus:outline-0 w-full"} contenteditable="true"> <!-- TODO: Once img can be given switch to w-7/11 -->
         <p class={"max-h-80 overflow-auto whitespace-pre-wrap " + (newNote ? "hidden" : "group-focus-within/note:hidden")} id=`noteTarget-${getId()}`>{note?.note}</p>
         <textarea 
-        name="note"
-        id=`noteInput-${getId()}`
-        placeholder="Note"
-        class={"input input-bordered input-sm w-full h-80 overflow-auto " + (newNote ? "flex" : "hidden group-focus-within/note:flex")}>{note?.note}</textarea>
+          name="note"
+          id=`noteInput-${getId()}`
+          placeholder="Note"
+          class={"input input-bordered input-sm w-full h-80 overflow-auto " + (newNote ? "flex" : "hidden group-focus-within/note:flex")}>{note?.note}</textarea>
       </div>
       <!-- TODO: Implement notes with images below -->
       {
@@ -67,4 +67,17 @@ const getId = () => newNote ? 'new-note' : note.id;
       }
     </div>
   </form>
+  <!-- NOTE: An ease of use script to disable cursor events for other items while editing -->
+  <script is:inline>
+    if (!window.setEditMode) {
+      window.setEditMode = function (on, id) {
+        const noteItems = document.getElementsByClassName('note-item');
+        for (const item of noteItems) {
+          if (on) { item.classList.add('pointer-events-none'); }
+          else { item.classList.remove('pointer-events-none'); }
+        }
+        document.getElementById(`note-${id}`).classList.remove('pointer-events-none');
+      }
+    }
+  </script>
 </div>
