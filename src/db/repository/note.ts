@@ -64,8 +64,9 @@ export async function getOwnedNotes(playerId: number, gameId?: number): Promise<
 
 /**
  * Get notes shared in a game that the user has access to
+ * @param gameId ID of the note in question
  * @param gameId ID of the game in question
- * @param gameId ID of the user in question
+ * @param playerIds IDs of the users to share to. If omitted, share to the whole game.
  * @returns List of notes with share times, may contain duplicates if shared multiple times
  */
 export async function shareNoteInGame(noteId: number, gameId: number, playerIds?: number[]): Promise<number[]> {

@@ -2,6 +2,7 @@
 import { actions } from "astro:actions";
 import { getCurrentPlayerId } from "../db/utils/session";
 import DeleteNoteButton from "./dynamic/DeleteNoteButton";
+import ShareNoteButton from "./dynamic/ShareNoteButton";
 
 const gameId = Astro.props.gameId;
 const note = Astro.props.note;
@@ -41,9 +42,7 @@ const getId = () => newNote ? 'new-note' : note.id;
         {
           !newNote &&
           <DeleteNoteButton id={note.id} client:only="/"/>
-          <div class="tooltip" data-tip="Share note to game">
-            <a type="button" href={`/toolkit/game/${gameId}`} class="btn btn-circle btn-primary w-8 h-8 mr-4"><img class="w-6 h-6" src="/icons/triangle_right.svg"/></a>
-          </div>
+          <ShareNoteButton id={note.id} gameId={gameId} client:only="/"/>
         }
       </div>
     </div>
