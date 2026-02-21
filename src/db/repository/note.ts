@@ -1,4 +1,4 @@
-import { and, db, eq, isNull, Note, or, ShareNoteEvent } from 'astro:db';
+import { and, db, desc, eq, isNull, Note, or, ShareNoteEvent } from 'astro:db';
 
 export type Note = { id: number, playerId: number, createdAt: Date, note: string, title?: string, imgSrc?: string, gameId?: number, sharedAt?: Date };
 export type NoteUpdate = { note?: string, title?: string, imgSrc?: string, gameId?: number };
@@ -110,6 +110,7 @@ export async function getSharedNotesForUserFeed(gameId: number, playerId: number
     .from(ShareNoteEvent)
     .where(and(eq(ShareNoteEvent.gameId, gameId), or(eq(ShareNoteEvent.playerId, playerId), isNull(ShareNoteEvent.playerId))))
     .innerJoin(Note, eq(ShareNoteEvent.noteId, Note.id))
+    .orderBy(desc(ShareNoteEvent.sharedAt))
     .all()
     ).map(val => ({ ...val.Note, sharedAt: val.ShareNoteEvent.sharedAt })) as Note[];
   return notes || [];
