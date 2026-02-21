@@ -104,7 +104,7 @@ export async function shareNoteInGame(noteId: number, gameId: number, playerIds?
  * @param playerId ID of the player in question
  * @returns List of notes with share times, may contain duplicates if shared multiple times
  */
-export async function getSharedNotesForUserFeed(gameId: number, playerId: number): Promise<Note[]> {
+export async function getSharedNotesForUserFeed(playerId: number, gameId: number): Promise<Note[]> {
   const notes = (await db
     .select()
     .from(ShareNoteEvent)

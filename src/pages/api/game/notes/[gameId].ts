@@ -6,7 +6,7 @@ import { validateEndpoints } from '../../../../db/utils/validation';
 export const GET: APIRoute = async ({ cookies, params }) => {
   try {
     const { playerId, gameIdAsNumber } = await validateEndpoints(cookies, params.gameId);
-    const notes = await getSharedNotesForUserFeed(gameIdAsNumber, playerId);
+    const notes = await getSharedNotesForUserFeed(playerId, gameIdAsNumber);
 
     return new Response(
       JSON.stringify({ notes }),

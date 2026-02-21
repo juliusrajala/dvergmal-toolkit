@@ -86,9 +86,17 @@ export const Note = defineTable({
 export const ShareNoteEvent = defineTable({
   columns: {
     id: column.number({ primaryKey: true, unique: true }),
-    noteId: column.number({ references: () => Note.columns.id }),
-    gameId: column.number({ references: () => Game.columns.id }),
-    playerId: column.number({ references: () => Game.columns.id, optional: true }),
+    /**
+     * TODO:
+     * The following columns should be configured as references. However, this ran into a problem with foreign key constraints during deletion. See how to properly handle this.
+     * 
+     * noteId: column.number({ references: () => Note.columns.id }),                          
+     * gameId: column.number({ references: () => Game.columns.id }),
+     * playerId: column.number({ references: () => Player.columns.id, optional: true }),
+     */
+    noteId: column.number(),
+    gameId: column.number(),
+    playerId: column.number({ optional: true }),
     sharedAt: column.date()
   }
 })

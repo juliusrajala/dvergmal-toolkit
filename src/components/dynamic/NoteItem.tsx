@@ -13,7 +13,7 @@ const NoteItem = ({ note }: Props) => {
           <div className="divider m-0"/>
         </div>
       }
-      <div className='font-semibold text-sm text-success'>{note.note}</div>
+      <div className='font-semibold text-sm text-success whitespace-pre-wrap'>{note.note}</div>
     </div>
   );
 };

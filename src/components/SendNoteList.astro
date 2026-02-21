@@ -13,7 +13,7 @@ if (!userId) {
   return Astro.redirect("/");
 }
 
-const dmNotes = await getOwnedNotes(userId, gameId);
+const notes = await getOwnedNotes(userId, gameId);
 const noteTitle = (note: Note) => {
   const useTitle = note.title ?? note.note;
   return useTitle.length > 43 ? useTitle.substring(0, 40) + '...' : useTitle;
@@ -31,10 +31,10 @@ const error = checkForError();
 ---
 
 <div class="w-full">
-  <h1 class="card-title mb-3 ml-0">GM NOTES</h1>
+  <h1 class="card-title mb-3 ml-0">NOTES</h1>
   {
-    dmNotes.length
-    ? dmNotes.map((note) =>  (
+    notes.length
+    ? notes.map((note) =>  (
       <div class="group flex w-full mb-3 note-item" id={`note-${note.id}`}>
       {/* LIST ITEM */}
         <div class="flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2 group-focus-within:border-t-2 group-focus-within:border-l-2">
@@ -75,7 +75,7 @@ const error = checkForError();
     It is here, so that the input fields are only hidden if they match with their initial values and that the save button is disabled according to if there are changes.
     The elements referenced are actually defined in the NoteViewModal component.
   -->
-  <script define:vars={{dmNotes}}>
+  <script define:vars={{notes}}>
     function checkInputClasses(inputElem, targetElem, changesDict, key, noteId) {
       const valueChanged = targetElem.innerText !== inputElem.value;
       changesDict.values[key] = valueChanged;
@@ -106,7 +106,7 @@ const error = checkForError();
       values: {},
       keys: []
     };
-    for (const note of dmNotes) {
+    for (const note of notes) {
       listenForInputChange(`titleInput-${note.id}`, `titleTarget-${note.id}`, changes, note.id);
       listenForInputChange(`noteInput-${note.id}`, `noteTarget-${note.id}`, changes, note.id);
     }
