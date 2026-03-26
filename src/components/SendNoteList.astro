@@ -1,0 +1,116 @@
+---
+import { actions } from 'astro:actions';
+import { getOwnedNotes } from "../db/repository/note";
+import { getCurrentPlayerId } from "../db/utils/session";
+import type { Note } from "../db/repository/note";
+import NoteViewModal from "./NoteViewModal.astro";
+
+const gameId = Astro.props.gameId;
+
+const userId = await getCurrentPlayerId(Astro.cookies);
+if (!userId) {
+  console.error("No user logged in, redirecting to /");
+  return Astro.redirect("/");
+}
+
+const notes = await getOwnedNotes(userId, gameId);
+const noteTitle = (note: Note) => {
+  const useTitle = note.title ?? note.note;
+  return useTitle.length > 43 ? useTitle.substring(0, 40) + '...' : useTitle;
+}
+
+const checkForError = () => {
+  let result = Astro.getActionResult(actions.createNote);
+  if (result && result.error) { return result.error.message; }
+  result = Astro.getActionResult(actions.updateNote);
+  if (result && result.error) { return result.error.message; }
+  return undefined;
+}
+const error = checkForError();
+
+---
+
+<div class="w-full">
+  <h1 class="card-title mb-3 ml-0">NOTES</h1>
+  {
+    notes.length
+    ? notes.map((note) =>  (
+      <div class="group flex w-full mb-3 note-item" id={`note-${note.id}`}>
+      {/* LIST ITEM */}
+        <div class="flex justify-between w-full p-1 border-b-2 group-hover:border-t-2 group-hover:border-l-2 group-focus-within:border-t-2 group-focus-within:border-l-2">
+          <span class="text-center w-full group-hover:w-19/20 group-focus-within:w-19/20">{noteTitle(note)}</span>
+          <span class="ml-1 hidden group-hover:inline group-focus-within:inline">{'>'}</span>
+        </div>
+        {/* ON HOVER MODAL */}
+        <div class="relative z-1 hidden group-hover:inline group-focus-within:inline">
+          <NoteViewModal gameId={Number(gameId)} note={note} />
+        </div>
+      </div>
+    ))
+    : <div class="flex w-full mb-4"><span class="w-full italic text-center">NO NOTES YET</span></div>
+  }
+  <!-- ADD NEW NOTE -->
+  <div class="group flex w-full mb-3 note-item" id="note-new-note">
+    <div 
+      class="
+        btn btn-primary btn-md flex justify-between w-full p-1 border-b-2
+        group-hover:border-t-2 group-hover:border-l-2 group-hover:rounded-none 
+        group-focus-within:border-t-2 group-focus-within:border-l-2 group-focus-within:rounded-none">
+      <div class="flex justify-center w-full group-hover:w-19/20 group-focus-within:w-19/20"><img class="w-6 h-6" src="/icons/plus.svg"/></div>
+      <span class="ml-1 hidden group-hover:inline group-focus-within:inline">{'>'}</span>
+    </div>
+    <div class="relative z-1 hidden group-hover:inline group-focus-within:inline">
+      <NoteViewModal gameId={Number(gameId)} />
+    </div>
+  </div>
+
+  {
+    error &&
+    <p>{error}</p>
+  }
+
+  <!--
+    NOTE:
+    I absolutely despise that the below script was the most efficient way I found to keep NoteViewModal from ballooning into two different modals.
+    It is here, so that the input fields are only hidden if they match with their initial values and that the save button is disabled according to if there are changes.
+    The elements referenced are actually defined in the NoteViewModal component.
+  -->
+  <script define:vars={{notes}}>
+    function checkInputClasses(inputElem, targetElem, changesDict, key, noteId) {
+      const valueChanged = targetElem.innerText !== inputElem.value;
+      changesDict.values[key] = valueChanged;
+      if (!changesDict.keys.includes(key)) { changesDict.keys.push(key); }
+      if (valueChanged) {
+        inputElem.classList.remove('hidden');
+        targetElem.classList.add('hidden');
+      } else {
+        inputElem.classList.add('hidden');
+        targetElem.classList.remove('hidden');
+      }
+      const saveButton = document.getElementById(`saveNote-${noteId}`);
+      const disabled = !changesDict.keys.some(key => changesDict.values[key]);
+      if (disabled) {
+        saveButton.setAttribute('disabled', disabled);
+      } else {
+        saveButton.removeAttribute('disabled');
+      }
+    }
+
+    function listenForInputChange(input, target, changesDict, noteId) {
+      const inputElem = document.getElementById(input);
+      const targetElem = document.getElementById(target);
+      inputElem.addEventListener('change', () => { checkInputClasses(inputElem, targetElem, changesDict, input, noteId); });
+    }
+
+    const changes = {
+      values: {},
+      keys: []
+    };
+    for (const note of notes) {
+      listenForInputChange(`titleInput-${note.id}`, `titleTarget-${note.id}`, changes, note.id);
+      listenForInputChange(`noteInput-${note.id}`, `noteTarget-${note.id}`, changes, note.id);
+    }
+    listenForInputChange(`titleInput-new-note`, `titleTarget-new-note`, changes, 'new-note');
+    listenForInputChange(`noteInput-new-note`, `noteTarget-new-note`, changes, 'new-note');
+  </script>
+</div>
